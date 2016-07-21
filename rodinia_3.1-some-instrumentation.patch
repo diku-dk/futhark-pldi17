@@ -145,6 +145,50 @@ diff -ru rodinia_3.1/opencl/hotspot/run rodinia_3.1-patched/opencl/hotspot/run
 -./hotspot 512 2 2 ../../data/hotspot/temp_512 ../../data/hotspot/power_512 output.out
 +./hotspot 1024 2 360 ../../data/hotspot/temp_1024 ../../data/hotspot/power_1024 /dev/null
 Only in rodinia_3.1-patched/opencl/hotspot: runtimes
+Binary files rodinia_3.1/opencl/kmeans/kmeans and rodinia_3.1-patched/opencl/kmeans/kmeans differ
+Binary files rodinia_3.1/opencl/kmeans/kmeans_clustering.o and rodinia_3.1-patched/opencl/kmeans/kmeans_clustering.o differ
+diff -ru rodinia_3.1/opencl/kmeans/read_input.c rodinia_3.1-patched/opencl/kmeans/read_input.c
+--- rodinia_3.1/opencl/kmeans/read_input.c	2015-12-11 16:46:41.000000000 +0100
++++ rodinia_3.1-patched/opencl/kmeans/read_input.c	2016-07-21 16:59:13.542357177 +0200
+@@ -82,7 +82,8 @@
+ 
+ extern double wtime(void);
+ 
+-
++#include <sys/time.h>
++static struct timeval t_start, t_end;
+ 
+ /*---< usage() >------------------------------------------------------------*/
+ void usage(char *argv0) {
+@@ -235,6 +236,12 @@
+ 	/* ======================= core of the clustering ===================*/
+ 
+     //cluster_timing = omp_get_wtime();		/* Total clustering time */
++
++        int runs = atoi(getenv("RODINIA_RUNS"));
++        int run;
++        FILE* runtimes = fopen("runtimes", "w");
++        for (run = 0; run < runs; run++) {
++          gettimeofday(&t_start, NULL);
+ 	cluster_centres = NULL;
+     index = cluster(npoints,				/* number of data points */
+ 					nfeatures,				/* number of features for each point */
+@@ -246,7 +253,11 @@
+ 				   &cluster_centres,		/* return: [best_nclusters][nfeatures] */  
+ 				   &rmse,					/* Root Mean Squared Error */
+ 					isRMSE,					/* calculate RMSE */
+-					nloops);				/* number of iteration for each number of clusters */		
++					nloops);				/* number of iteration for each number of clusters */
++    gettimeofday(&t_end, NULL);
++    fprintf(runtimes, "%d\n",
++            (t_end.tv_sec*1000000+t_end.tv_usec) - (t_start.tv_sec*1000000+t_start.tv_usec));
++        }
+     
+ 	//cluster_timing = omp_get_wtime() - cluster_timing;
+ 
+Binary files rodinia_3.1/opencl/kmeans/read_input.o and rodinia_3.1-patched/opencl/kmeans/read_input.o differ
+Only in rodinia_3.1-patched/opencl/kmeans: runtimes
+Only in rodinia_3.1/opencl/kmeans: unistd.h
 diff -ru rodinia_3.1/opencl/nn/nearestNeighbor.cpp rodinia_3.1-patched/opencl/nn/nearestNeighbor.cpp
 --- rodinia_3.1/opencl/nn/nearestNeighbor.cpp	2015-12-11 16:46:29.000000000 +0100
 +++ rodinia_3.1-patched/opencl/nn/nearestNeighbor.cpp	2016-07-21 13:39:36.360797098 +0200

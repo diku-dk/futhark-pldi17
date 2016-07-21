@@ -59,6 +59,16 @@ runtimes/cfd-futhark.runtimes: futhark-benchmarks
 	futhark-opencl $</rodinia/cfd/cfd.fut
 	$</rodinia/cfd/cfd -r $(RUNS) -t $@ < $</rodinia/cfd/data/fvcorr.domn.097K.toa > /dev/null
 
+runtimes/kmeans-rodinia.runtimes: rodinia_3.1-patched
+	mkdir -p runtimes
+	(cd $</opencl/kmeans && make && RODINIA_RUNS=$(RUNS) ./run)
+	cp $</opencl/kmeans/runtimes $@
+
+runtimes/kmeans-futhark.runtimes: futhark-benchmarks
+	mkdir -p runtimes
+	futhark-opencl $</rodinia/kmeans/kmeans.fut
+	$</rodinia/kmeans/kmeans -r $(RUNS) -t $@ < $</rodinia/kmeans/data/kdd_cup.in > /dev/null
+
 futhark-benchmarks:
 	git clone --depth 1 https://github.com/HIPERFIT/futhark-benchmarks.git
 
