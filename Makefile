@@ -2,7 +2,7 @@ RODINIA_URL=http://www.cs.virginia.edu/~kw5na/lava/Rodinia/Packages/Current/rodi
 RODINIA_MD5=047d983e62107972f217921aa0027b05  rodinia_3.1.tar.bz2
 RUNS=10
 
-RODINIA_BENCHMARKS=srad hotspot
+RODINIA_BENCHMARKS=srad hotspot nn backprop cfd
 
 all: $(RODINIA_BENCHMARKS:%=runtimes/%-rodinia.avgtime) $(RODINIA_BENCHMARKS:%=runtimes/%-futhark.avgtime)
 
