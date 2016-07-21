@@ -51,6 +51,60 @@ diff -ru rodinia_3.1/opencl/backprop/run rodinia_3.1-patched/opencl/backprop/run
 +./backprop 1048576
 \ No newline at end of file
 Only in rodinia_3.1-patched/opencl/backprop: runtimes
+Only in rodinia_3.1-patched/opencl/cfd: density
+Only in rodinia_3.1-patched/opencl/cfd: density_energy
+Only in rodinia_3.1-patched/opencl/cfd: euler3d
+diff -ru rodinia_3.1/opencl/cfd/euler3d.cpp rodinia_3.1-patched/opencl/cfd/euler3d.cpp
+--- rodinia_3.1/opencl/cfd/euler3d.cpp	2015-12-11 16:46:29.000000000 +0100
++++ rodinia_3.1-patched/opencl/cfd/euler3d.cpp	2016-07-21 15:23:37.820448447 +0200
+@@ -12,6 +12,9 @@
+ 	on 24/03/2011
+ ********************************************************************/
+ 
++#include <sys/time.h>
++static struct timeval t_start, t_end;
++
+ #include <iostream>
+ #include <fstream>
+ #include <math.h>
+@@ -22,7 +25,7 @@
+  * 
+  */ 
+ #define GAMMA 1.4f
+-#define iterations 2000
++#define iterations 1300
+ #ifndef block_length
+ 	#define block_length 192
+ #endif
+@@ -345,6 +348,10 @@
+ 		// these need to be computed the first time in order to compute time step
+ 		std::cout << "Starting..." << std::endl;
+ 
++                int runs = atoi(getenv("RODINIA_RUNS"));
++                FILE* runtimes = fopen("runtimes", "w");
++                for (int run = 0; run < runs; run++) {
++                gettimeofday(&t_start, NULL);
+ 		// Begin iterations
+ 		for(int i = 0; i < iterations; i++){
+ 			copy<float>(old_variables, variables, nelr*NVAR);
+@@ -358,8 +365,13 @@
+ 			}
+ 		}
+ 		_clFinish();
++                gettimeofday(&t_end, NULL);
++                fprintf(runtimes, "%d\n",
++                        (t_end.tv_sec*1000000+t_end.tv_usec) - (t_start.tv_sec*1000000+t_start.tv_usec));
++                }
++                fclose(runtimes);
+ 		std::cout << "Saving solution..." << std::endl;
+-		dump(variables, nel, nelr);
++                dump(variables, nel, nelr);
+ 		std::cout << "Saved solution..." << std::endl;
+ 		_clStatistics();
+ 		std::cout << "Cleaning up..." << std::endl;
+Only in rodinia_3.1-patched/opencl/cfd: momentum
+Only in rodinia_3.1-patched/opencl/cfd: PD_OCL.txt
+Only in rodinia_3.1-patched/opencl/cfd: runtimes
 Binary files rodinia_3.1/opencl/hotspot/hotspot and rodinia_3.1-patched/opencl/hotspot/hotspot differ
 diff -ru rodinia_3.1/opencl/hotspot/hotspot.c rodinia_3.1-patched/opencl/hotspot/hotspot.c
 --- rodinia_3.1/opencl/hotspot/hotspot.c	2015-12-11 16:46:31.000000000 +0100

@@ -49,6 +49,16 @@ runtimes/backprop-futhark.runtimes: futhark-benchmarks
 	futhark-opencl $</rodinia/backprop/backprop.fut
 	$</rodinia/backprop/backprop -r $(RUNS) -t $@ < $</rodinia/backprop/data/medium.in > /dev/null
 
+runtimes/cfd-rodinia.runtimes: rodinia_3.1-patched
+	mkdir -p runtimes
+	(cd $</opencl/cfd && make && RODINIA_RUNS=$(RUNS) ./run)
+	cp $</opencl/cfd/runtimes $@
+
+runtimes/cfd-futhark.runtimes: futhark-benchmarks
+	mkdir -p runtimes
+	futhark-opencl $</rodinia/cfd/cfd.fut
+	$</rodinia/cfd/cfd -r $(RUNS) -t $@ < $</rodinia/cfd/data/fvcorr.domn.097K.toa > /dev/null
+
 futhark-benchmarks:
 	git clone --depth 1 https://github.com/HIPERFIT/futhark-benchmarks.git
 
