@@ -1,0 +1,88 @@
+diff -ru rodinia_3.1/opencl/srad/kernel/kernel_gpu_opencl_wrapper.c rodinia_3.1-patched/opencl/srad/kernel/kernel_gpu_opencl_wrapper.c
+--- rodinia_3.1/opencl/srad/kernel/kernel_gpu_opencl_wrapper.c	2015-12-11 16:46:39.000000000 +0100
++++ rodinia_3.1-patched/opencl/srad/kernel/kernel_gpu_opencl_wrapper.c	2016-07-21 13:05:22.190711431 +0200
+@@ -1,3 +1,9 @@
++#include <stdlib.h>
++#include <sys/time.h>
++#include <error.h>
++#include <errno.h>
++static struct timeval t_start, t_end;
++
+ //========================================================================================================================================================================================================200
+ //	DEFINE/INCLUDE
+ //========================================================================================================================================================================================================200
+@@ -537,7 +543,11 @@
+ 	//====================================================================================================100
+ 	//	set arguments
+ 	//====================================================================================================100
+-
++        FILE* runtimes = fopen("runtimes", "w");
++        int runs = atoi(getenv("RODINIA_RUNS"));
++        int i;
++        for (i = 0; i < runs; i++) {
++gettimeofday(&t_start, NULL);
+ 	error = clSetKernelArg(	extract_kernel, 
+ 							0, 
+ 							sizeof(long), 
+@@ -1024,6 +1034,14 @@
+ 		//====================================================================================================100
+ 
+ 	}
++        error = clFinish(command_queue);
++	if (error != CL_SUCCESS)
++          fatal_CL(error, __LINE__);
++
++        gettimeofday(&t_end, NULL);
++        fprintf(runtimes, "%d\n",
++                (t_end.tv_sec*1000000+t_end.tv_usec) - (t_start.tv_sec*1000000+t_start.tv_usec));
++        }
+ 
+ 	printf("\n");
+ 
+Binary files rodinia_3.1/opencl/srad/kernel/kernel_gpu_opencl_wrapper.o and rodinia_3.1-patched/opencl/srad/kernel/kernel_gpu_opencl_wrapper.o differ
+diff -ru rodinia_3.1/opencl/srad/main.c rodinia_3.1-patched/opencl/srad/main.c
+--- rodinia_3.1/opencl/srad/main.c	2015-12-11 16:46:39.000000000 +0100
++++ rodinia_3.1-patched/opencl/srad/main.c	2016-07-21 13:01:45.145788103 +0200
+@@ -222,12 +222,14 @@
+ 	// 	WRITE OUTPUT IMAGE TO FILE
+ 	//======================================================================================================================================================150
+ 
+-	write_graphics(	"./output/image_out.pgm",
+-					image,
+-					Nr,
+-					Nc,
+-					1,
+-					255);
++        if (0) { // Disabled for benchmarking
++          write_graphics(	"./output/image_out.pgm",
++                                image,
++                                Nr,
++                                Nc,
++                                1,
++                                255);
++        }
+ 
+ 	time5 = get_time();
+ 
+@@ -258,6 +260,7 @@
+ 	printf("Total time:\n");
+ 	printf("%.12f s\n", 																(fp) (time5-time0) / 1000000);
+ 
++        return 0;
+ }
+ 
+ //========================================================================================================================================================================================================200
+Binary files rodinia_3.1/opencl/srad/main.o and rodinia_3.1-patched/opencl/srad/main.o differ
+Only in rodinia_3.1-patched/opencl/srad: runtimes
+Binary files rodinia_3.1/opencl/srad/srad and rodinia_3.1-patched/opencl/srad/srad differ
+diff -ru rodinia_3.1/README rodinia_3.1-patched/README
+--- rodinia_3.1/README	2016-07-21 13:04:10.366173343 +0200
++++ rodinia_3.1-patched/README	2016-07-21 13:04:30.407728141 +0200
+@@ -1,3 +1,6 @@
++NOTICE: this tree has been modified by the futhark-ppopp17 Makefile
++to add consistent timing to some benchmark implementations.
++
+ Rodinia Benchmark Suite 3.1
+ ===========================
+ 
+Only in rodinia_3.1-patched/: rodinia_3.1

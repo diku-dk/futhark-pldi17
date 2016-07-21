@@ -1,0 +1,10 @@
+runtimes
+tools
+
+# Ignore downloaded and extracted Rodinia
+rodinia_3.1
+rodinia_3.1-patched
+rodinia_3.1.tar.bz2
+
+# Ignore Futhark benchmarks
+futhark-benchmarks
