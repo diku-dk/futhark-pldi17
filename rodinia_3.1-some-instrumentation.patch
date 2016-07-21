@@ -1,3 +1,56 @@
+Only in rodinia_3.1-patched/opencl/backprop: backprop
+Only in rodinia_3.1-patched/opencl/backprop: backprop.o
+diff -ru rodinia_3.1/opencl/backprop/backprop_ocl.cpp rodinia_3.1-patched/opencl/backprop/backprop_ocl.cpp
+--- rodinia_3.1/opencl/backprop/backprop_ocl.cpp	2015-12-11 16:46:38.000000000 +0100
++++ rodinia_3.1-patched/opencl/backprop/backprop_ocl.cpp	2016-07-21 15:01:33.152201597 +0200
+@@ -12,6 +12,7 @@
+ 	#include <CL/cl.h>
+ #endif
+ 
++static struct timeval t_start, t_end;
+ 
+ ////////////////////////////////////////////////////////////////////////////////
+ 
+@@ -183,6 +184,13 @@
+ 	if(err != CL_SUCCESS) { printf("ERROR: clCreateBuffer input_prev_weights_ocl\n"); return -1;}
+ 		
+ 	printf("Performing GPU computation\n");
++
++        int run;
++        int runs = atoi(getenv("RODINIA_RUNS"));
++        FILE* runtimes = fopen("runtimes", "w");
++
++        for (run = 0; run < runs; run++) {
++          gettimeofday(&t_start, NULL);
+ 	
+ 	//write buffers
+ 	err = clEnqueueWriteBuffer(cmd_queue, input_ocl, 1, 0, (in + 1) * sizeof(float), net->input_units, 0, 0, 0);
+@@ -235,7 +243,13 @@
+ 	clSetKernelArg(kernel2, 5, sizeof(void *), (void*) &input_prev_weights_ocl );
+   
+ 	err = clEnqueueNDRangeKernel(cmd_queue, kernel2, 2, NULL, global_work, local_work, 0, 0, 0);
+-	if(err != CL_SUCCESS) { printf("ERROR: 1  clEnqueueNDRangeKernel()=>%d failed\n", err); return -1; }	
++	if(err != CL_SUCCESS) { printf("ERROR: 1  clEnqueueNDRangeKernel()=>%d failed\n", err); return -1; }
++        clFinish(cmd_queue);
++        gettimeofday(&t_end, NULL);
++        fprintf(runtimes, "%d\n",
++                (t_end.tv_sec*1000000+t_end.tv_usec) - (t_start.tv_sec*1000000+t_start.tv_usec));
++        }
++        fclose(runtimes);
+   
+ 	err = clEnqueueReadBuffer(cmd_queue, input_ocl, 1, 0, (in + 1) * sizeof(float), net->input_units, 0, 0, 0);
+ 	if(err != CL_SUCCESS) { printf("ERROR: 1  clEnqueueReadBuffer: input_ocl\n"); return -1; }	
+Only in rodinia_3.1-patched/opencl/backprop: facetrain.o
+Only in rodinia_3.1-patched/opencl/backprop: imagenet.o
+diff -ru rodinia_3.1/opencl/backprop/run rodinia_3.1-patched/opencl/backprop/run
+--- rodinia_3.1/opencl/backprop/run	2015-12-11 16:46:38.000000000 +0100
++++ rodinia_3.1-patched/opencl/backprop/run	2016-07-21 14:56:44.880736763 +0200
+@@ -1 +1 @@
+-./backprop 65536
+\ No newline at end of file
++./backprop 1048576
+\ No newline at end of file
+Only in rodinia_3.1-patched/opencl/backprop: runtimes
 Binary files rodinia_3.1/opencl/hotspot/hotspot and rodinia_3.1-patched/opencl/hotspot/hotspot differ
 diff -ru rodinia_3.1/opencl/hotspot/hotspot.c rodinia_3.1-patched/opencl/hotspot/hotspot.c
 --- rodinia_3.1/opencl/hotspot/hotspot.c	2015-12-11 16:46:31.000000000 +0100
