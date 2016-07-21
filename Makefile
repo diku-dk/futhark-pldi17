@@ -23,8 +23,8 @@ futhark-benchmarks:
 	git clone --depth 1 https://github.com/HIPERFIT/futhark-benchmarks.git
 
 rodinia_3.1-patched: rodinia_3.1
-#	cp -r rodinia_3.1 rodinia_3.1-patched
-#	patch -p0 < rodinia_3.1-some-instrumentation.patch
+	cp -r rodinia_3.1 rodinia_3.1-patched
+	patch -p0 < rodinia_3.1-some-instrumentation.patch
 
 rodinia_3.1: rodinia_3.1.tar.bz2
 	@if ! md5sum --quiet -c rodinia_3.1.tar.bz2.md5; then \
