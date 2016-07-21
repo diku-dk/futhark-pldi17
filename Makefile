@@ -29,6 +29,16 @@ runtimes/hotspot-futhark.runtimes: futhark-benchmarks
 	futhark-opencl $</rodinia/hotspot/hotspot.fut
 	$</rodinia/hotspot/hotspot -r $(RUNS) -t $@ < $</rodinia/hotspot/data/1024.in > /dev/null
 
+runtimes/nn-rodinia.runtimes: rodinia_3.1-patched
+	mkdir -p runtimes
+	(cd $</opencl/nn && make && RODINIA_RUNS=$(RUNS) ./run)
+	cp $</opencl/nn/runtimes $@
+
+runtimes/nn-futhark.runtimes: futhark-benchmarks
+	mkdir -p runtimes
+	futhark-opencl $</rodinia/nn/nn.fut
+	$</rodinia/nn/nn -r $(RUNS) -t $@ < $</rodinia/nn/data/medium.in > /dev/null
+
 futhark-benchmarks:
 	git clone --depth 1 https://github.com/HIPERFIT/futhark-benchmarks.git
 

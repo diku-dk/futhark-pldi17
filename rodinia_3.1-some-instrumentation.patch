@@ -38,6 +38,54 @@ diff -ru rodinia_3.1/opencl/hotspot/run rodinia_3.1-patched/opencl/hotspot/run
 -./hotspot 512 2 2 ../../data/hotspot/temp_512 ../../data/hotspot/power_512 output.out
 +./hotspot 1024 2 360 ../../data/hotspot/temp_1024 ../../data/hotspot/power_1024 /dev/null
 Only in rodinia_3.1-patched/opencl/hotspot: runtimes
+diff -ru rodinia_3.1/opencl/nn/nearestNeighbor.cpp rodinia_3.1-patched/opencl/nn/nearestNeighbor.cpp
+--- rodinia_3.1/opencl/nn/nearestNeighbor.cpp	2015-12-11 16:46:29.000000000 +0100
++++ rodinia_3.1-patched/opencl/nn/nearestNeighbor.cpp	2016-07-21 13:39:36.360797098 +0200
+@@ -3,6 +3,9 @@
+ 
+ #include "nearestNeighbor.h"
+ 
++#include <sys/time.h>
++static struct timeval t_start, t_end;
++
+ cl_context context=NULL;
+ 
+ int main(int argc, char *argv[]) {
+@@ -37,11 +40,20 @@
+   if (resultsCount > numRecords) resultsCount = numRecords;
+ 
+   context = cl_init_context(platform,device,quiet);
+-  
+-  recordDistances = OpenClFindNearestNeighbors(context,numRecords,locations,lat,lng,timing);
+-
+-  // find the resultsCount least distances
+-  findLowest(records,recordDistances,numRecords,resultsCount);
++  int run;
++  int runs = atoi(getenv("RODINIA_RUNS"));
++  FILE* runtimes = fopen("runtimes", "w");
++  for (run = 0; run < runs; run++) {
++    gettimeofday(&t_start, NULL);
++    recordDistances = OpenClFindNearestNeighbors(context,numRecords,locations,lat,lng,timing);
++
++    // find the resultsCount least distances
++    findLowest(records,recordDistances,numRecords,resultsCount);
++    gettimeofday(&t_end, NULL);
++    fprintf(runtimes,
++            "%d\n",
++            (t_end.tv_sec*1000000+t_end.tv_usec) - (t_start.tv_sec*1000000+t_start.tv_usec));
++  }
+ 
+   // print out results
+   if (!quiet)
+Binary files rodinia_3.1/opencl/nn/nn and rodinia_3.1-patched/opencl/nn/nn differ
+diff -ru rodinia_3.1/opencl/nn/run rodinia_3.1-patched/opencl/nn/run
+--- rodinia_3.1/opencl/nn/run	2015-12-11 16:46:30.000000000 +0100
++++ rodinia_3.1-patched/opencl/nn/run	2016-07-21 13:41:37.878917445 +0200
+@@ -1 +1 @@
+-./nn filelist.txt -r 5 -lat 30 -lng 90
+\ No newline at end of file
++./nn filelist.txt -r 100 -lat 30 -lng 90 -d 0 -p 0
+Only in rodinia_3.1-patched/opencl/nn: runtimes
 diff -ru rodinia_3.1/opencl/srad/kernel/kernel_gpu_opencl_wrapper.c rodinia_3.1-patched/opencl/srad/kernel/kernel_gpu_opencl_wrapper.c
 --- rodinia_3.1/opencl/srad/kernel/kernel_gpu_opencl_wrapper.c	2015-12-11 16:46:39.000000000 +0100
 +++ rodinia_3.1-patched/opencl/srad/kernel/kernel_gpu_opencl_wrapper.c	2016-07-21 13:05:22.190711431 +0200
