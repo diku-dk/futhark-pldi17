@@ -1,3 +1,43 @@
+Binary files rodinia_3.1/opencl/hotspot/hotspot and rodinia_3.1-patched/opencl/hotspot/hotspot differ
+diff -ru rodinia_3.1/opencl/hotspot/hotspot.c rodinia_3.1-patched/opencl/hotspot/hotspot.c
+--- rodinia_3.1/opencl/hotspot/hotspot.c	2015-12-11 16:46:31.000000000 +0100
++++ rodinia_3.1-patched/opencl/hotspot/hotspot.c	2016-07-21 13:22:27.962339987 +0200
+@@ -86,10 +86,13 @@
+ 	local_work_size[1] = BLOCK_SIZE;
+ 	
+ 	
+-	long long start_time = get_time();	
+-	
++
++        int run;
++        int runs = atoi(getenv("RODINIA_RUNS"));
++        FILE* runtimes = fopen("runtimes", "w");
++        for (run = 0; run < runs; run++) {
++        long long start_time = get_time();
+ 	for (t = 0; t < total_iterations; t += num_iterations) {
+-		
+ 		// Specify kernel arguments
+ 		int iter = MIN(num_iterations, total_iterations - t);
+ 		clSetKernelArg(kernel, 0, sizeof(int), (void *) &iter);
+@@ -124,8 +127,9 @@
+ 	if (error != CL_SUCCESS) fatal_CL(error, __LINE__);
+ 	
+ 	long long end_time = get_time();
+-	long long total_time = (end_time - start_time);	
+-	printf("\nKernel time: %.3f seconds\n", ((float) total_time) / (1000*1000));
++	long long total_time = (end_time - start_time);
++        fprintf(runtimes, "%lld\n", total_time);
++        }
+ 	
+ 	return src;
+ }
+diff -ru rodinia_3.1/opencl/hotspot/run rodinia_3.1-patched/opencl/hotspot/run
+--- rodinia_3.1/opencl/hotspot/run	2015-12-11 16:46:31.000000000 +0100
++++ rodinia_3.1-patched/opencl/hotspot/run	2016-07-21 13:28:26.388514452 +0200
+@@ -1 +1 @@
+-./hotspot 512 2 2 ../../data/hotspot/temp_512 ../../data/hotspot/power_512 output.out
++./hotspot 1024 2 360 ../../data/hotspot/temp_1024 ../../data/hotspot/power_1024 /dev/null
+Only in rodinia_3.1-patched/opencl/hotspot: runtimes
 diff -ru rodinia_3.1/opencl/srad/kernel/kernel_gpu_opencl_wrapper.c rodinia_3.1-patched/opencl/srad/kernel/kernel_gpu_opencl_wrapper.c
 --- rodinia_3.1/opencl/srad/kernel/kernel_gpu_opencl_wrapper.c	2015-12-11 16:46:39.000000000 +0100
 +++ rodinia_3.1-patched/opencl/srad/kernel/kernel_gpu_opencl_wrapper.c	2016-07-21 13:05:22.190711431 +0200

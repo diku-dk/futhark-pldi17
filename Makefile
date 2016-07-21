@@ -2,9 +2,9 @@ RODINIA_URL=http://www.cs.virginia.edu/~kw5na/lava/Rodinia/Packages/Current/rodi
 RODINIA_MD5=047d983e62107972f217921aa0027b05  rodinia_3.1.tar.bz2
 RUNS=10
 
-BENCHMARKS=srad
+RODINIA_BENCHMARKS=srad hotspot
 
-all: $(BENCHMARKS:%=runtimes/%-rodinia.avgtime) $(BENCHMARKS:%=runtimes/%-futhark.avgtime)
+all: $(RODINIA_BENCHMARKS:%=runtimes/%-rodinia.avgtime) $(RODINIA_BENCHMARKS:%=runtimes/%-futhark.avgtime)
 
 runtimes/%.avgtime: runtimes/%.runtimes
 	awk '{sum += strtonum($$0) / 1000.0} END{print sum/NR}' < $< > $@
@@ -18,6 +18,16 @@ runtimes/srad-futhark.runtimes: futhark-benchmarks
 	mkdir -p runtimes
 	futhark-opencl $</rodinia/srad/srad_core.fut
 	$</rodinia/srad/srad_core -r $(RUNS) -t $@ < $</rodinia/srad/data/image.in > /dev/null
+
+runtimes/hotspot-rodinia.runtimes: rodinia_3.1-patched
+	mkdir -p runtimes
+	(cd $</opencl/hotspot && make && RODINIA_RUNS=$(RUNS) ./run)
+	cp $</opencl/hotspot/runtimes $@
+
+runtimes/hotspot-futhark.runtimes: futhark-benchmarks
+	mkdir -p runtimes
+	futhark-opencl $</rodinia/hotspot/hotspot.fut
+	$</rodinia/hotspot/hotspot -r $(RUNS) -t $@ < $</rodinia/hotspot/data/1024.in > /dev/null
 
 futhark-benchmarks:
 	git clone --depth 1 https://github.com/HIPERFIT/futhark-benchmarks.git
