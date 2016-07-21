@@ -62,14 +62,12 @@ runtimes/cfd-futhark.runtimes: futhark-benchmarks
 futhark-benchmarks:
 	git clone --depth 1 https://github.com/HIPERFIT/futhark-benchmarks.git
 
-rodinia_3.1-patched: rodinia_3.1
-	cp -r rodinia_3.1 rodinia_3.1-patched
-	patch -p0 < rodinia_3.1-some-instrumentation.patch
-
-rodinia_3.1: rodinia_3.1.tar.bz2
+rodinia_3.1-patched: rodinia_3.1.tar.bz2
 	@if ! md5sum --quiet -c rodinia_3.1.tar.bz2.md5; then \
           echo "Your rodinia_3.1.tar.bz2 has the wrong MD5-sum - delete it and try again."; exit 1; fi
 	tar jxf rodinia_3.1.tar.bz2
+	mv rodinia_3.1 rodinia_3.1-patched
+	patch -p0 < rodinia_3.1-some-instrumentation.patch
 
 rodinia_3.1.tar.bz2:
 	wget http://www.cs.virginia.edu/~kw5na/lava/Rodinia/Packages/Current/rodinia_3.1.tar.bz2
