@@ -145,11 +145,22 @@ diff -ru rodinia_3.1/opencl/hotspot/run rodinia_3.1-patched/opencl/hotspot/run
 -./hotspot 512 2 2 ../../data/hotspot/temp_512 ../../data/hotspot/power_512 output.out
 +./hotspot 1024 2 360 ../../data/hotspot/temp_1024 ../../data/hotspot/power_1024 /dev/null
 Only in rodinia_3.1-patched/opencl/hotspot: runtimes
-Binary files rodinia_3.1/opencl/kmeans/kmeans and rodinia_3.1-patched/opencl/kmeans/kmeans differ
-Binary files rodinia_3.1/opencl/kmeans/kmeans_clustering.o and rodinia_3.1-patched/opencl/kmeans/kmeans_clustering.o differ
+Binary files rodinia_3.1/opencl/kmeans/cluster.o and rodinia_3.1-patched/opencl/kmeans/cluster.o differ
+Binary files rodinia_3.1/opencl/kmeans/getopt.o and rodinia_3.1-patched/opencl/kmeans/getopt.o differ
+Only in rodinia_3.1/opencl/kmeans: kmeans
+Only in rodinia_3.1/opencl/kmeans: kmeans_clustering.o
+diff -ru rodinia_3.1/opencl/kmeans/Makefile rodinia_3.1-patched/opencl/kmeans/Makefile
+--- rodinia_3.1/opencl/kmeans/Makefile	2015-12-11 16:46:41.000000000 +0100
++++ rodinia_3.1-patched/opencl/kmeans/Makefile	2016-07-22 08:39:33.920312628 +0200
+@@ -22,4 +22,4 @@
+ 	$(CC) $(CC_FLAGS) rmse.c -c
+ 
+ clean:
+-	rm -f *.o *~ kmeans *.linkinfo
++	rm -f *.o *~ kmeans *.linkinfo unistd.h
 diff -ru rodinia_3.1/opencl/kmeans/read_input.c rodinia_3.1-patched/opencl/kmeans/read_input.c
 --- rodinia_3.1/opencl/kmeans/read_input.c	2015-12-11 16:46:41.000000000 +0100
-+++ rodinia_3.1-patched/opencl/kmeans/read_input.c	2016-07-21 16:59:13.542357177 +0200
++++ rodinia_3.1-patched/opencl/kmeans/read_input.c	2016-07-22 08:38:19.556114560 +0200
 @@ -82,7 +82,8 @@
  
  extern double wtime(void);
@@ -186,7 +197,8 @@ diff -ru rodinia_3.1/opencl/kmeans/read_input.c rodinia_3.1-patched/opencl/kmean
      
  	//cluster_timing = omp_get_wtime() - cluster_timing;
  
-Binary files rodinia_3.1/opencl/kmeans/read_input.o and rodinia_3.1-patched/opencl/kmeans/read_input.o differ
+Only in rodinia_3.1/opencl/kmeans: read_input.o
+Only in rodinia_3.1/opencl/kmeans: rmse.o
 Only in rodinia_3.1-patched/opencl/kmeans: runtimes
 Only in rodinia_3.1/opencl/kmeans: unistd.h
 diff -ru rodinia_3.1/opencl/lavaMD/kernel/kernel_gpu_opencl_wrapper.c rodinia_3.1-patched/opencl/lavaMD/kernel/kernel_gpu_opencl_wrapper.c
