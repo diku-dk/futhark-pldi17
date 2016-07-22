@@ -11,7 +11,7 @@ runtimes/%.avgtime: runtimes/%.runtimes
 
 runtimes/srad-rodinia.runtimes: rodinia_3.1-patched
 	mkdir -p runtimes
-	(cd $</opencl/srad && make && RODINIA_RUNS=$(RUNS) ./run)
+	(cd $</opencl/srad && make clean && make && RODINIA_RUNS=$(RUNS) ./run)
 	cp $</opencl/srad/runtimes $@
 
 runtimes/srad-futhark.runtimes: futhark-benchmarks
@@ -21,7 +21,7 @@ runtimes/srad-futhark.runtimes: futhark-benchmarks
 
 runtimes/hotspot-rodinia.runtimes: rodinia_3.1-patched
 	mkdir -p runtimes
-	(cd $</opencl/hotspot && make && RODINIA_RUNS=$(RUNS) ./run)
+	(cd $</opencl/hotspot && make clean && make && RODINIA_RUNS=$(RUNS) ./run)
 	cp $</opencl/hotspot/runtimes $@
 
 runtimes/hotspot-futhark.runtimes: futhark-benchmarks
@@ -31,7 +31,7 @@ runtimes/hotspot-futhark.runtimes: futhark-benchmarks
 
 runtimes/nn-rodinia.runtimes: rodinia_3.1-patched
 	mkdir -p runtimes
-	(cd $</opencl/nn && make && RODINIA_RUNS=$(RUNS) ./run)
+	(cd $</opencl/nn && make clean && make && RODINIA_RUNS=$(RUNS) ./run)
 	cp $</opencl/nn/runtimes $@
 
 runtimes/nn-futhark.runtimes: futhark-benchmarks
@@ -41,7 +41,7 @@ runtimes/nn-futhark.runtimes: futhark-benchmarks
 
 runtimes/backprop-rodinia.runtimes: rodinia_3.1-patched
 	mkdir -p runtimes
-	(cd $</opencl/backprop && make && RODINIA_RUNS=$(RUNS) ./run)
+	(cd $</opencl/backprop && make clean && make && RODINIA_RUNS=$(RUNS) ./run)
 	cp $</opencl/backprop/runtimes $@
 
 runtimes/backprop-futhark.runtimes: futhark-benchmarks
@@ -51,7 +51,7 @@ runtimes/backprop-futhark.runtimes: futhark-benchmarks
 
 runtimes/cfd-rodinia.runtimes: rodinia_3.1-patched
 	mkdir -p runtimes
-	(cd $</opencl/cfd && make && RODINIA_RUNS=$(RUNS) ./run)
+	(cd $</opencl/cfd && make clean && make && RODINIA_RUNS=$(RUNS) ./run)
 	cp $</opencl/cfd/runtimes $@
 
 runtimes/cfd-futhark.runtimes: futhark-benchmarks
@@ -61,7 +61,7 @@ runtimes/cfd-futhark.runtimes: futhark-benchmarks
 
 runtimes/kmeans-rodinia.runtimes: rodinia_3.1-patched
 	mkdir -p runtimes
-	(cd $</opencl/kmeans && make && RODINIA_RUNS=$(RUNS) ./run)
+	(cd $</opencl/kmeans && make clean && make && RODINIA_RUNS=$(RUNS) ./run)
 	cp $</opencl/kmeans/runtimes $@
 
 runtimes/kmeans-futhark.runtimes: futhark-benchmarks
@@ -71,7 +71,7 @@ runtimes/kmeans-futhark.runtimes: futhark-benchmarks
 
 runtimes/lavaMD-rodinia.runtimes: rodinia_3.1-patched
 	mkdir -p runtimes
-	(cd $</opencl/lavaMD && make && RODINIA_RUNS=$(RUNS) ./run)
+	(cd $</opencl/lavaMD && make clean && make && RODINIA_RUNS=$(RUNS) ./run)
 	cp $</opencl/lavaMD/runtimes $@
 
 runtimes/lavaMD-futhark.runtimes: futhark-benchmarks
@@ -81,7 +81,7 @@ runtimes/lavaMD-futhark.runtimes: futhark-benchmarks
 
 runtimes/pathfinder-rodinia.runtimes: rodinia_3.1-patched
 	mkdir -p runtimes
-	(cd $</opencl/pathfinder && make && RODINIA_RUNS=$(RUNS) ./run)
+	(cd $</opencl/pathfinder && make clean && make && RODINIA_RUNS=$(RUNS) ./run)
 	cp $</opencl/pathfinder/runtimes $@
 
 runtimes/pathfinder-futhark.runtimes: futhark-benchmarks
