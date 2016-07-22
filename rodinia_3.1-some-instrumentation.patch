@@ -230,6 +230,14 @@ Only in rodinia_3.1-patched/opencl/lavaMD: runtimes
 Only in rodinia_3.1-patched/opencl/lavaMD/util/num: num.o
 Only in rodinia_3.1-patched/opencl/lavaMD/util/opencl: opencl.o
 Only in rodinia_3.1-patched/opencl/lavaMD/util/timer: timer.o
+Only in rodinia_3.1-patched/opencl/myocyte/kernel: kernel_gpu_opencl_wrapper.o
+Only in rodinia_3.1-patched/opencl/myocyte: main.o
+Only in rodinia_3.1-patched/opencl/myocyte: myocyte.out
+Only in rodinia_3.1-patched/opencl/myocyte: output.txt
+Only in rodinia_3.1-patched/opencl/myocyte/util/file: file.o
+Only in rodinia_3.1-patched/opencl/myocyte/util/num: num.o
+Only in rodinia_3.1-patched/opencl/myocyte/util/opencl: opencl.o
+Only in rodinia_3.1-patched/opencl/myocyte/util/timer: timer.o
 diff -ru rodinia_3.1/opencl/nn/nearestNeighbor.cpp rodinia_3.1-patched/opencl/nn/nearestNeighbor.cpp
 --- rodinia_3.1/opencl/nn/nearestNeighbor.cpp	2015-12-11 16:46:29.000000000 +0100
 +++ rodinia_3.1-patched/opencl/nn/nearestNeighbor.cpp	2016-07-21 13:39:36.360797098 +0200
@@ -278,6 +286,68 @@ diff -ru rodinia_3.1/opencl/nn/run rodinia_3.1-patched/opencl/nn/run
 \ No newline at end of file
 +./nn filelist.txt -r 100 -lat 30 -lng 90 -d 0 -p 0
 Only in rodinia_3.1-patched/opencl/nn: runtimes
+diff -ru rodinia_3.1/opencl/pathfinder/main.cpp rodinia_3.1-patched/opencl/pathfinder/main.cpp
+--- rodinia_3.1/opencl/pathfinder/main.cpp	2015-12-11 16:46:29.000000000 +0100
++++ rodinia_3.1-patched/opencl/pathfinder/main.cpp	2016-07-22 07:28:08.966354301 +0200
+@@ -17,6 +17,9 @@
+ #include <iostream>
+ #include "OpenCL.h"
+ 
++#include <sys/time.h>
++static struct timeval t_start, t_end;
++
+ using namespace std;
+ 
+ // halo width along one direction when advancing to the next iteration
+@@ -131,18 +134,26 @@
+ 	                                NULL,
+ 	                                NULL);
+ 
++        FILE* runtimes = fopen("runtimes", "w");
++        int run;
++        int runs = atoi(getenv("RODINIA_RUNS"));
+ 	cl_int* h_outputBuffer = (cl_int*)malloc(16384*sizeof(cl_int));
+-	for (int i = 0; i < 16384; i++)
+-	{
+-		h_outputBuffer[i] = 0;
+-	}
+ 	cl_mem d_outputBuffer = clCreateBuffer(cl.ctxt(),
+ 	                                       CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
+ 	                                       sizeof(cl_int)*16384,
+ 	                                       h_outputBuffer,
+ 	                                       NULL);
+-
+ 	int src = 1, final_ret = 0;
++
++        for (run = 0; run < runs; run++) {
++	for (int i = 0; i < 16384; i++)
++	{
++		h_outputBuffer[i] = 0;
++	}
++        gettimeofday(&t_start, NULL);
++
++	src = 1;
++        final_ret = 0;
+ 	for (int t = 0; t < rows - 1; t += pyramid_height)
+ 	{
+ 		int temp = src;
+@@ -168,6 +179,11 @@
+ 		clSetKernelArg(cl.kernel(kn), 11, sizeof(cl_mem), (void*) &d_outputBuffer);
+ 		cl.launch(kn);
+ 	}
++        clFinish(cl.q());
++        gettimeofday(&t_end, NULL);
++        fprintf(runtimes, "%d\n",
++                (t_end.tv_sec*1000000+t_end.tv_usec) - (t_start.tv_sec*1000000+t_start.tv_usec));
++        }
+ 
+ 	// Copy results back to host.
+ 	clEnqueueReadBuffer(cl.q(),                   // The command queue.
+Only in rodinia_3.1-patched/opencl/pathfinder: main.o
+Only in rodinia_3.1-patched/opencl/pathfinder: OpenCL.o
+Only in rodinia_3.1-patched/opencl/pathfinder: pathfinder
+Only in rodinia_3.1-patched/opencl/pathfinder: result.txt
+Only in rodinia_3.1-patched/opencl/pathfinder: runtimes
 diff -ru rodinia_3.1/opencl/srad/kernel/kernel_gpu_opencl_wrapper.c rodinia_3.1-patched/opencl/srad/kernel/kernel_gpu_opencl_wrapper.c
 --- rodinia_3.1/opencl/srad/kernel/kernel_gpu_opencl_wrapper.c	2015-12-11 16:46:39.000000000 +0100
 +++ rodinia_3.1-patched/opencl/srad/kernel/kernel_gpu_opencl_wrapper.c	2016-07-21 13:05:22.190711431 +0200

@@ -2,7 +2,7 @@ RODINIA_URL=http://www.cs.virginia.edu/~kw5na/lava/Rodinia/Packages/Current/rodi
 RODINIA_MD5=047d983e62107972f217921aa0027b05  rodinia_3.1.tar.bz2
 RUNS=10
 
-RODINIA_BENCHMARKS=srad hotspot nn backprop cfd kmeans lavaMD
+RODINIA_BENCHMARKS=srad hotspot nn backprop cfd kmeans lavaMD pathfinder
 
 all: $(RODINIA_BENCHMARKS:%=runtimes/%-rodinia.avgtime) $(RODINIA_BENCHMARKS:%=runtimes/%-futhark.avgtime)
 
@@ -78,6 +78,16 @@ runtimes/lavaMD-futhark.runtimes: futhark-benchmarks
 	mkdir -p runtimes
 	futhark-opencl $</rodinia/lavaMD/lavaMD.fut
 	$</rodinia/lavaMD/lavaMD -r $(RUNS) -t $@ < $</rodinia/lavaMD/data/medium.in > /dev/null
+
+runtimes/pathfinder-rodinia.runtimes: rodinia_3.1-patched
+	mkdir -p runtimes
+	(cd $</opencl/pathfinder && make && RODINIA_RUNS=$(RUNS) ./run)
+	cp $</opencl/pathfinder/runtimes $@
+
+runtimes/pathfinder-futhark.runtimes: futhark-benchmarks
+	mkdir -p runtimes
+	futhark-opencl $</rodinia/pathfinder/pathfinder.fut
+	$</rodinia/pathfinder/pathfinder -r $(RUNS) -t $@ < $</rodinia/pathfinder/data/medium.in > /dev/null
 
 futhark-benchmarks:
 	git clone --depth 1 https://github.com/HIPERFIT/futhark-benchmarks.git
