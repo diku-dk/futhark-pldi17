@@ -2,7 +2,7 @@ RODINIA_URL=http://www.cs.virginia.edu/~kw5na/lava/Rodinia/Packages/Current/rodi
 RODINIA_MD5=047d983e62107972f217921aa0027b05  rodinia_3.1.tar.bz2
 RUNS=10
 
-RODINIA_BENCHMARKS=srad hotspot nn backprop cfd kmeans lavaMD pathfinder
+RODINIA_BENCHMARKS=srad hotspot nn backprop cfd kmeans lavaMD pathfinder myocyte
 
 all: $(RODINIA_BENCHMARKS:%=runtimes/%-rodinia.avgtime) $(RODINIA_BENCHMARKS:%=runtimes/%-futhark.avgtime)
 
@@ -88,6 +88,18 @@ runtimes/pathfinder-futhark.runtimes: futhark-benchmarks
 	mkdir -p runtimes
 	futhark-opencl $</rodinia/pathfinder/pathfinder.fut
 	$</rodinia/pathfinder/pathfinder -r $(RUNS) -t $@ < $</rodinia/pathfinder/data/medium.in > /dev/null
+
+# Myocyte uses the CUDA version, because the OpenCL one does not
+# support the workload>1 case efficiently.
+runtimes/myocyte-rodinia.runtimes: rodinia_3.1-patched
+	mkdir -p runtimes
+	(cd $</cuda/myocyte && make clean && make && RODINIA_RUNS=$(RUNS) ./run)
+	cp $</cuda/myocyte/runtimes $@
+
+runtimes/myocyte-futhark.runtimes: futhark-benchmarks
+	mkdir -p runtimes
+	futhark-opencl $</rodinia/myocyte/myocyte.fut
+	$</rodinia/myocyte/myocyte -r $(RUNS) -t $@ < $</rodinia/myocyte/data/medium.in > /dev/null
 
 futhark-benchmarks:
 	git clone --depth 1 https://github.com/HIPERFIT/futhark-benchmarks.git
