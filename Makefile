@@ -62,7 +62,7 @@ runtimes/cfd-rodinia.runtimes: rodinia_3.1-patched
 runtimes/cfd-futhark.runtimes: futhark-benchmarks
 	mkdir -p runtimes
 	futhark-opencl $</rodinia/cfd/cfd.fut
-	$</rodinia/cfd/cfd -r $(RUNS) -t $@ < $</rodinia/cfd/data/fvcorr.domn.097K.toa > /dev/null
+	$</rodinia/cfd/cfd -r $(RUNS) -t $@ < $</rodinia/cfd/data/fvcorr.domn.193K.toa > /dev/null
 
 runtimes/kmeans-rodinia.runtimes: rodinia_3.1-patched
 	mkdir -p runtimes

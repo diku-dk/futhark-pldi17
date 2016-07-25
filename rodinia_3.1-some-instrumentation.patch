@@ -1,3 +1,17 @@
+diff -ru rodinia_3.1/cuda/lavaMD/main.c rodinia_3.1-patched/cuda/lavaMD/main.c
+--- rodinia_3.1/cuda/lavaMD/main.c	2015-12-11 16:46:08.000000000 +0100
++++ rodinia_3.1-patched/cuda/lavaMD/main.c	2016-07-25 10:34:55.783753065 +0200
+@@ -224,8 +224,8 @@
+ 	//	PARAMETERS, DISTANCE, CHARGE AND FORCE
+ 	//====================================================================================================100
+ 
+-	// random generator seed set to random value - time in this case
+-	srand(time(NULL));
++	// random generator seed set to random value - 42 in this case
++	srand(42);
+ 
+ 	// input (distances)
+ 	rv_cpu = (FOUR_VECTOR*)malloc(dim_cpu.space_mem);
 diff -ru rodinia_3.1/cuda/myocyte/define.c rodinia_3.1-patched/cuda/myocyte/define.c
 --- rodinia_3.1/cuda/myocyte/define.c	2015-12-11 16:46:06.000000000 +0100
 +++ rodinia_3.1-patched/cuda/myocyte/define.c	2016-07-23 07:57:04.083826750 +0200
@@ -10,7 +24,6 @@ diff -ru rodinia_3.1/cuda/myocyte/define.c rodinia_3.1-patched/cuda/myocyte/defi
  
  #define EQUATIONS 91
  #define PARAMETERS 18
-Only in rodinia_3.1-patched/cuda/myocyte: define.c~
 Only in rodinia_3.1-patched/cuda/myocyte: main.o
 diff -ru rodinia_3.1/cuda/myocyte/Makefile rodinia_3.1-patched/cuda/myocyte/Makefile
 --- rodinia_3.1/cuda/myocyte/Makefile	2015-12-11 16:46:06.000000000 +0100
@@ -29,7 +42,6 @@ diff -ru rodinia_3.1/cuda/myocyte/run rodinia_3.1-patched/cuda/myocyte/run
 -./myocyte.out 100 1 0
 +./myocyte.out 3 65536 1
 Only in rodinia_3.1-patched/cuda/myocyte: run_cos
-Only in rodinia_3.1-patched/cuda/myocyte: run_cos~
 Only in rodinia_3.1-patched/cuda/myocyte: runtimes
 diff -ru rodinia_3.1/cuda/myocyte/work_2.cu rodinia_3.1-patched/cuda/myocyte/work_2.cu
 --- rodinia_3.1/cuda/myocyte/work_2.cu	2015-12-11 16:46:06.000000000 +0100
@@ -159,7 +171,6 @@ diff -ru rodinia_3.1/cuda/myocyte/work_2.cu rodinia_3.1-patched/cuda/myocyte/wor
  //====================================================================================================100
  //		END OF FILE
  //====================================================================================================100
-Only in rodinia_3.1-patched/cuda/myocyte: work_2.cu~
 Only in rodinia_3.1-patched/opencl/backprop: backprop
 Only in rodinia_3.1-patched/opencl/backprop: backprop.o
 diff -ru rodinia_3.1/opencl/backprop/backprop_ocl.cpp rodinia_3.1-patched/opencl/backprop/backprop_ocl.cpp
@@ -218,7 +229,7 @@ Only in rodinia_3.1-patched/opencl/cfd: density_energy
 Only in rodinia_3.1-patched/opencl/cfd: euler3d
 diff -ru rodinia_3.1/opencl/cfd/euler3d.cpp rodinia_3.1-patched/opencl/cfd/euler3d.cpp
 --- rodinia_3.1/opencl/cfd/euler3d.cpp	2015-12-11 16:46:29.000000000 +0100
-+++ rodinia_3.1-patched/opencl/cfd/euler3d.cpp	2016-07-22 22:43:01.421983152 +0200
++++ rodinia_3.1-patched/opencl/cfd/euler3d.cpp	2016-07-25 11:38:29.393821643 +0200
 @@ -12,6 +12,9 @@
  	on 24/03/2011
  ********************************************************************/
@@ -229,15 +240,6 @@ diff -ru rodinia_3.1/opencl/cfd/euler3d.cpp rodinia_3.1-patched/opencl/cfd/euler
  #include <iostream>
  #include <fstream>
  #include <math.h>
-@@ -22,7 +25,7 @@
-  * 
-  */ 
- #define GAMMA 1.4f
--#define iterations 2000
-+#define iterations 1300
- #ifndef block_length
- 	#define block_length 192
- #endif
 @@ -345,6 +348,10 @@
  		// these need to be computed the first time in order to compute time step
  		std::cout << "Starting..." << std::endl;
@@ -266,6 +268,17 @@ diff -ru rodinia_3.1/opencl/cfd/euler3d.cpp rodinia_3.1-patched/opencl/cfd/euler
  		std::cout << "Cleaning up..." << std::endl;
 Only in rodinia_3.1-patched/opencl/cfd: momentum
 Only in rodinia_3.1-patched/opencl/cfd: PD_OCL.txt
+diff -ru rodinia_3.1/opencl/cfd/run rodinia_3.1-patched/opencl/cfd/run
+--- rodinia_3.1/opencl/cfd/run	2015-12-11 16:46:29.000000000 +0100
++++ rodinia_3.1-patched/opencl/cfd/run	2016-07-25 11:35:50.641476894 +0200
+@@ -9,6 +9,6 @@
+ 
+ for ((  i=1;  i<=1;  i++))
+ do
+-  ./euler3d ../../data/cfd/fvcorr.domn.097K -t gpu -d 0
++  ./euler3d ../../data/cfd/fvcorr.domn.193K -t gpu -d 0
+ #  ./euler3d ../../data/cfd/fvcorr.domn.097K 1
+ done
 Only in rodinia_3.1-patched/opencl/cfd: runtimes
 Binary files rodinia_3.1/opencl/hotspot/hotspot and rodinia_3.1-patched/opencl/hotspot/hotspot differ
 diff -ru rodinia_3.1/opencl/hotspot/hotspot.c rodinia_3.1-patched/opencl/hotspot/hotspot.c
@@ -399,6 +412,20 @@ diff -ru rodinia_3.1/opencl/lavaMD/kernel/kernel_gpu_opencl_wrapper.c rodinia_3.
  	//======================================================================================================================================================150
 Only in rodinia_3.1-patched/opencl/lavaMD/kernel: kernel_gpu_opencl_wrapper.o
 Only in rodinia_3.1-patched/opencl/lavaMD: lavaMD
+diff -ru rodinia_3.1/opencl/lavaMD/main.c rodinia_3.1-patched/opencl/lavaMD/main.c
+--- rodinia_3.1/opencl/lavaMD/main.c	2015-12-11 16:46:33.000000000 +0100
++++ rodinia_3.1-patched/opencl/lavaMD/main.c	2016-07-25 10:31:39.408691329 +0200
+@@ -254,8 +254,8 @@
+ 	//	PARAMETERS, DISTANCE, CHARGE AND FORCE
+ 	//====================================================================================================100
+ 
+-	// random generator seed set to random value - time in this case
+-	srand(time(NULL));
++	// random generator seed set to random value - 42 in this case
++	srand(42);
+ 
+ 	// input (distances)
+ 	rv_cpu = (FOUR_VECTOR*)malloc(dim_cpu.space_mem);
 Only in rodinia_3.1-patched/opencl/lavaMD: main.o
 diff -ru rodinia_3.1/opencl/lavaMD/makefile rodinia_3.1-patched/opencl/lavaMD/makefile
 --- rodinia_3.1/opencl/lavaMD/makefile	2015-12-11 16:46:33.000000000 +0100
