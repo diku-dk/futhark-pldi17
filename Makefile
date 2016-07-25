@@ -4,7 +4,12 @@ RUNS=10
 
 RODINIA_BENCHMARKS=srad hotspot nn backprop cfd kmeans lavaMD pathfinder myocyte
 
-all: $(RODINIA_BENCHMARKS:%=runtimes/%-rodinia.avgtime) $(RODINIA_BENCHMARKS:%=runtimes/%-futhark.avgtime)
+.SECONDARY:
+
+all: $(RODINIA_BENCHMARKS:%=runtimes/%.speedup)
+
+runtimes/%.speedup: runtimes/%-futhark.avgtime runtimes/%-rodinia.avgtime
+	@echo "scale=2; $(shell cat runtimes/$*-rodinia.avgtime) / $(shell cat runtimes/$*-futhark.avgtime)" | bc > $@
 
 runtimes/%.avgtime: runtimes/%.runtimes
 	awk '{sum += strtonum($$0) / 1000.0} END{print sum/NR}' < $< > $@
