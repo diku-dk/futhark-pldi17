@@ -443,10 +443,94 @@ Only in rodinia_3.1-patched/opencl/lavaMD: runtimes
 Only in rodinia_3.1-patched/opencl/lavaMD/util/num: num.o
 Only in rodinia_3.1-patched/opencl/lavaMD/util/opencl: opencl.o
 Only in rodinia_3.1-patched/opencl/lavaMD/util/timer: timer.o
+diff -ru rodinia_3.1/opencl/nn/filelist.txt rodinia_3.1-patched/opencl/nn/filelist.txt
+--- rodinia_3.1/opencl/nn/filelist.txt	2015-12-11 16:46:30.000000000 +0100
++++ rodinia_3.1-patched/opencl/nn/filelist.txt	2016-07-25 13:32:17.748357272 +0200
+@@ -2,4 +2,79 @@
+ ../../data/nn/cane4_1.db
+ ../../data/nn/cane4_2.db
+ ../../data/nn/cane4_3.db
+-
++../../data/nn/cane4_0.db
++../../data/nn/cane4_1.db
++../../data/nn/cane4_2.db
++../../data/nn/cane4_3.db
++../../data/nn/cane4_0.db
++../../data/nn/cane4_1.db
++../../data/nn/cane4_2.db
++../../data/nn/cane4_3.db
++../../data/nn/cane4_0.db
++../../data/nn/cane4_1.db
++../../data/nn/cane4_2.db
++../../data/nn/cane4_3.db
++../../data/nn/cane4_0.db
++../../data/nn/cane4_1.db
++../../data/nn/cane4_2.db
++../../data/nn/cane4_3.db
++../../data/nn/cane4_0.db
++../../data/nn/cane4_1.db
++../../data/nn/cane4_2.db
++../../data/nn/cane4_3.db
++../../data/nn/cane4_0.db
++../../data/nn/cane4_1.db
++../../data/nn/cane4_2.db
++../../data/nn/cane4_3.db
++../../data/nn/cane4_0.db
++../../data/nn/cane4_1.db
++../../data/nn/cane4_2.db
++../../data/nn/cane4_3.db
++../../data/nn/cane4_0.db
++../../data/nn/cane4_1.db
++../../data/nn/cane4_2.db
++../../data/nn/cane4_3.db
++../../data/nn/cane4_0.db
++../../data/nn/cane4_1.db
++../../data/nn/cane4_2.db
++../../data/nn/cane4_3.db
++../../data/nn/cane4_0.db
++../../data/nn/cane4_1.db
++../../data/nn/cane4_2.db
++../../data/nn/cane4_3.db
++../../data/nn/cane4_0.db
++../../data/nn/cane4_1.db
++../../data/nn/cane4_2.db
++../../data/nn/cane4_3.db
++../../data/nn/cane4_0.db
++../../data/nn/cane4_1.db
++../../data/nn/cane4_2.db
++../../data/nn/cane4_3.db
++../../data/nn/cane4_0.db
++../../data/nn/cane4_1.db
++../../data/nn/cane4_2.db
++../../data/nn/cane4_3.db
++../../data/nn/cane4_0.db
++../../data/nn/cane4_1.db
++../../data/nn/cane4_2.db
++../../data/nn/cane4_3.db
++../../data/nn/cane4_0.db
++../../data/nn/cane4_1.db
++../../data/nn/cane4_2.db
++../../data/nn/cane4_3.db
++../../data/nn/cane4_0.db
++../../data/nn/cane4_1.db
++../../data/nn/cane4_2.db
++../../data/nn/cane4_3.db
++../../data/nn/cane4_0.db
++../../data/nn/cane4_1.db
++../../data/nn/cane4_2.db
++../../data/nn/cane4_3.db
++../../data/nn/cane4_0.db
++../../data/nn/cane4_1.db
++../../data/nn/cane4_2.db
++../../data/nn/cane4_3.db
++../../data/nn/cane4_0.db
++../../data/nn/cane4_1.db
++../../data/nn/cane4_2.db
++../../data/nn/cane4_3.db
 diff -ru rodinia_3.1/opencl/nn/nearestNeighbor.cpp rodinia_3.1-patched/opencl/nn/nearestNeighbor.cpp
 --- rodinia_3.1/opencl/nn/nearestNeighbor.cpp	2015-12-11 16:46:29.000000000 +0100
-+++ rodinia_3.1-patched/opencl/nn/nearestNeighbor.cpp	2016-07-22 22:43:01.602635337 +0200
-@@ -3,6 +3,9 @@
++++ rodinia_3.1-patched/opencl/nn/nearestNeighbor.cpp	2016-07-25 13:19:14.140574666 +0200
+@@ -3,7 +3,51 @@
  
  #include "nearestNeighbor.h"
  
@@ -454,9 +538,51 @@ diff -ru rodinia_3.1/opencl/nn/nearestNeighbor.cpp rodinia_3.1-patched/opencl/nn
 +static struct timeval t_start, t_end;
 +
  cl_context context=NULL;
++cl_kernel NN_kernel;
++cl_mem d_locations;
++cl_mem d_distances;
++cl_event writeEvent,kernelEvent,readEvent;
++cl_command_queue command_queue;
++
++void openClSetup(int numRecords, const std::vector<LatLong>& locations) {
++    // 1. set up kernel
++         cl_int status;
++        cl_program cl_NN_program;
++        cl_NN_program = cl_compileProgram(
++            (char *)"nearestNeighbor_kernel.cl",NULL);
++       
++        NN_kernel = clCreateKernel(
++            cl_NN_program, "NearestNeighbor", &status);
++        status = cl_errChk(status, (char *)"Error Creating Nearest Neighbor kernel",true);
++        if(status)exit(1);
++    // 2. set up memory on device and send ipts data to device
++    // copy ipts(1,2) to device
++    // also need to alloate memory for the distancePoints
++
++    cl_int error=0;
++
++    d_locations = clCreateBuffer(context, CL_MEM_READ_ONLY,
++        sizeof(LatLong) * numRecords, NULL, &error);
++
++    d_distances = clCreateBuffer(context, CL_MEM_READ_WRITE,
++        sizeof(float) * numRecords, NULL, &error);
++
++    command_queue = cl_getCommandQueue();
++    error = clEnqueueWriteBuffer(command_queue,
++               d_locations,
++               1, // change to 0 for nonblocking write
++               0, // offset
++               sizeof(LatLong) * numRecords,
++               &locations[0],
++               0,
++               NULL,
++               &writeEvent);
++
++}
  
  int main(int argc, char *argv[]) {
-@@ -37,11 +40,20 @@
+   std::vector<Record> records;
+@@ -37,11 +81,21 @@
    if (resultsCount > numRecords) resultsCount = numRecords;
  
    context = cl_init_context(platform,device,quiet);
@@ -468,6 +594,7 @@ diff -ru rodinia_3.1/opencl/nn/nearestNeighbor.cpp rodinia_3.1-patched/opencl/nn
 +  int run;
 +  int runs = atoi(getenv("RODINIA_RUNS"));
 +  FILE* runtimes = fopen("runtimes", "w");
++  openClSetup(numRecords, locations);
 +  for (run = 0; run < runs; run++) {
 +    gettimeofday(&t_start, NULL);
 +    recordDistances = OpenClFindNearestNeighbors(context,numRecords,locations,lat,lng,timing);
@@ -482,6 +609,63 @@ diff -ru rodinia_3.1/opencl/nn/nearestNeighbor.cpp rodinia_3.1-patched/opencl/nn
  
    // print out results
    if (!quiet)
+@@ -57,44 +111,8 @@
+ 	int numRecords,
+ 	std::vector<LatLong> &locations,float lat,float lng,
+ 	int timing) {
+-
+-    // 1. set up kernel
+-    cl_kernel NN_kernel;
+-        cl_int status;
+-        cl_program cl_NN_program;
+-        cl_NN_program = cl_compileProgram(
+-            (char *)"nearestNeighbor_kernel.cl",NULL);
+-       
+-        NN_kernel = clCreateKernel(
+-            cl_NN_program, "NearestNeighbor", &status);
+-        status = cl_errChk(status, (char *)"Error Creating Nearest Neighbor kernel",true);
+-        if(status)exit(1);
+-    // 2. set up memory on device and send ipts data to device
+-    // copy ipts(1,2) to device
+-    // also need to alloate memory for the distancePoints
+-    cl_mem d_locations;
+-    cl_mem d_distances;
+-
+     cl_int error=0;
+ 
+-    d_locations = clCreateBuffer(context, CL_MEM_READ_ONLY,
+-        sizeof(LatLong) * numRecords, NULL, &error);
+-
+-    d_distances = clCreateBuffer(context, CL_MEM_READ_WRITE,
+-        sizeof(float) * numRecords, NULL, &error);
+-
+-    cl_command_queue command_queue = cl_getCommandQueue();
+-    cl_event writeEvent,kernelEvent,readEvent;
+-    error = clEnqueueWriteBuffer(command_queue,
+-               d_locations,
+-               1, // change to 0 for nonblocking write
+-               0, // offset
+-               sizeof(LatLong) * numRecords,
+-               &locations[0],
+-               0,
+-               NULL,
+-               &writeEvent);
+-
+     // 3. send arguments to device
+     cl_int argchk;
+     argchk  = clSetKernelArg(NN_kernel, 0, sizeof(cl_mem), (void *)&d_locations);
+@@ -172,10 +190,7 @@
+         
+         printf("%f\n\n",(float)(totalTime/1e9));
+     }
+-    // 6. return finalized data and release buffers
+-    clReleaseMemObject(d_locations);
+-    clReleaseMemObject(d_distances);
+-	return distances;
++    return distances;
+ }
+ 
+ int loadData(char *filename,std::vector<Record> &records,std::vector<LatLong> &locations){
 Binary files rodinia_3.1/opencl/nn/nn and rodinia_3.1-patched/opencl/nn/nn differ
 diff -ru rodinia_3.1/opencl/nn/run rodinia_3.1-patched/opencl/nn/run
 --- rodinia_3.1/opencl/nn/run	2015-12-11 16:46:30.000000000 +0100
