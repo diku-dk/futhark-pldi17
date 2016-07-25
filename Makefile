@@ -122,3 +122,4 @@ rodinia_3.1.tar.bz2:
 clean:
 	rm -rf rodinia_3.1
 	rm -f rodinia_3.1.tar.bz2
+	rm -rf runtimes
