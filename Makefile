@@ -82,7 +82,7 @@ runtimes/lavaMD-rodinia.runtimes: rodinia_3.1-patched
 runtimes/lavaMD-futhark.runtimes: futhark-benchmarks
 	mkdir -p runtimes
 	futhark-opencl $</rodinia/lavaMD/lavaMD.fut
-	$</rodinia/lavaMD/lavaMD -r $(RUNS) -t $@ < $</rodinia/lavaMD/data/medium.in > /dev/null
+	$</rodinia/lavaMD/lavaMD -r $(RUNS) -t $@ < $</rodinia/lavaMD/data/10_boxes.in > /dev/null
 
 runtimes/pathfinder-rodinia.runtimes: rodinia_3.1-patched
 	mkdir -p runtimes

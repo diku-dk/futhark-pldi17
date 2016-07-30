@@ -1,33 +1,7 @@
-diff -ru rodinia_3.1/cuda/lavaMD/main.c rodinia_3.1-patched/cuda/lavaMD/main.c
---- rodinia_3.1/cuda/lavaMD/main.c	2015-12-11 16:46:08.000000000 +0100
-+++ rodinia_3.1-patched/cuda/lavaMD/main.c	2016-07-25 10:34:55.783753065 +0200
-@@ -224,8 +224,8 @@
- 	//	PARAMETERS, DISTANCE, CHARGE AND FORCE
- 	//====================================================================================================100
- 
--	// random generator seed set to random value - time in this case
--	srand(time(NULL));
-+	// random generator seed set to random value - 42 in this case
-+	srand(42);
- 
- 	// input (distances)
- 	rv_cpu = (FOUR_VECTOR*)malloc(dim_cpu.space_mem);
-diff -ru rodinia_3.1/cuda/myocyte/define.c rodinia_3.1-patched/cuda/myocyte/define.c
---- rodinia_3.1/cuda/myocyte/define.c	2015-12-11 16:46:06.000000000 +0100
-+++ rodinia_3.1-patched/cuda/myocyte/define.c	2016-07-23 07:57:04.083826750 +0200
-@@ -6,7 +6,7 @@
- 
- #define fp float
- 
--#define NUMBER_THREADS 32
-+#define NUMBER_THREADS 32 //256
- 
- #define EQUATIONS 91
- #define PARAMETERS 18
 Only in rodinia_3.1-patched/cuda/myocyte: main.o
 diff -ru rodinia_3.1/cuda/myocyte/Makefile rodinia_3.1-patched/cuda/myocyte/Makefile
 --- rodinia_3.1/cuda/myocyte/Makefile	2015-12-11 16:46:06.000000000 +0100
-+++ rodinia_3.1-patched/cuda/myocyte/Makefile	2016-07-23 08:02:22.729065147 +0200
++++ rodinia_3.1-patched/cuda/myocyte/Makefile	2016-07-30 14:07:26.986681104 +0200
 @@ -40,4 +40,4 @@
  
  # delete all object files
@@ -37,140 +11,49 @@ diff -ru rodinia_3.1/cuda/myocyte/Makefile rodinia_3.1-patched/cuda/myocyte/Make
 Only in rodinia_3.1-patched/cuda/myocyte: myocyte.out
 diff -ru rodinia_3.1/cuda/myocyte/run rodinia_3.1-patched/cuda/myocyte/run
 --- rodinia_3.1/cuda/myocyte/run	2015-12-11 16:46:06.000000000 +0100
-+++ rodinia_3.1-patched/cuda/myocyte/run	2016-07-23 07:58:46.025182714 +0200
++++ rodinia_3.1-patched/cuda/myocyte/run	2016-07-30 14:11:15.737518393 +0200
 @@ -1 +1 @@
 -./myocyte.out 100 1 0
 +./myocyte.out 3 65536 1
-Only in rodinia_3.1-patched/cuda/myocyte: run_cos
 Only in rodinia_3.1-patched/cuda/myocyte: runtimes
 diff -ru rodinia_3.1/cuda/myocyte/work_2.cu rodinia_3.1-patched/cuda/myocyte/work_2.cu
 --- rodinia_3.1/cuda/myocyte/work_2.cu	2015-12-11 16:46:06.000000000 +0100
-+++ rodinia_3.1-patched/cuda/myocyte/work_2.cu	2016-07-23 08:00:43.997855875 +0200
-@@ -9,6 +9,11 @@
++++ rodinia_3.1-patched/cuda/myocyte/work_2.cu	2016-07-30 14:15:58.785096464 +0200
+@@ -9,6 +9,9 @@
  #include "embedded_fehlberg_7_8_2.cu"
  #include "solver_2.cu"
  
 +#include <sys/time.h>
 +static struct timeval t_start, t_end;
 +
-+#define COSMIN_VERSION
-+
  //====================================================================================================100
  //		MAIN FUNCTION
  //====================================================================================================100
-@@ -39,7 +44,7 @@
- 	//============================================================60
- 
- 	long memory;
--	int i;
-+	int i, j;
- 	int pointer;
- 
- 	//============================================================60
-@@ -162,6 +167,31 @@
+@@ -213,6 +216,11 @@
+ 		blocks.y = 1;
  	}
- 	cudaMemcpy(d_x, x, x_mem, cudaMemcpyHostToDevice);
- 
-+#ifdef COSMIN_VERSION
-+    read("../../data/myocyte/y.txt",
-+					&y[0],
-+					91,
-+					1,
-+					0);
-+    read("../../data/myocyte/params.txt",
-+					&params[0],
-+					18,
-+					1,
-+					0);
-+
-+    for(i=1; i<workload; i++){
-+        // workload * (xmax+1) * EQUATIONS
-+        // workload * PARAMETERS
-+        pointer = i*((xmax+1)*EQUATIONS) + 0*(EQUATIONS);
-+        for(j = 0; j < EQUATIONS; j++) {
-+            y[pointer + j] = (i % 13)*0.0001 + y[j];
-+        }
-+        pointer = i*PARAMETERS;
-+        for(j = 0; j < PARAMETERS; j++) {
-+            params[pointer + j] = params[j];
-+        }
-+    }
-+#else
- 	//========================================40
- 	//		Y
- 	//========================================40
-@@ -174,7 +204,7 @@
- 					1,
- 					0);
- 	}
--	cudaMemcpy(d_y, y, y_mem, cudaMemcpyHostToDevice);
-+//	cudaMemcpy(d_y, y, y_mem, cudaMemcpyHostToDevice);
- 
- 	//========================================40
- 	//		PARAMS
-@@ -188,6 +218,10 @@
- 					1,
- 					0);
- 	}
-+//	cudaMemcpy(d_params, params, params_mem, cudaMemcpyHostToDevice);
-+#endif // ifdef COSMIN VERSION
-+
-+	cudaMemcpy(d_y, y, y_mem, cudaMemcpyHostToDevice);
- 	cudaMemcpy(d_params, params, params_mem, cudaMemcpyHostToDevice);
- 
- 	time3 = get_time();
-@@ -196,6 +230,12 @@
- 	//		EXECUTION IF THERE ARE MANY WORKLOADS
- 	//================================================================================80
  
 +        int runs = atoi(getenv("RODINIA_RUNS"));
-+
 +        FILE* runtimes = fopen("runtimes", "w");
-+        for (int run = 0; run < runs; run++) {
-+          gettimeofday(&t_start, NULL);
-+
- 	if(workload == 1){
- 		threads.x = 32;																			// define the number of threads in the block
- 		threads.y = 1;
-@@ -227,10 +267,18 @@
++        int run;
++        for (run = 0; run < runs; run++) {
++        gettimeofday(&t_start, NULL);
+ 	solver_2<<<blocks, threads>>>(	workload,
+ 																xmax,
+ 
+@@ -226,6 +234,12 @@
+ 																d_yy,
  																d_initvalu_temp,
  																d_finavalu_temp);
- 
--	// cudaThreadSynchronize();
--	// printf("CUDA error: %s\n", cudaGetErrorString(cudaGetLastError()));
-+	cudaThreadSynchronize();
- 
--	time4 = get_time();
++        cudaThreadSynchronize();
 +        gettimeofday(&t_end, NULL);
 +
 +        fprintf(runtimes, "%d\n",
 +                (t_end.tv_sec*1000000+t_end.tv_usec) - (t_start.tv_sec*1000000+t_start.tv_usec));
 +        }
-+        fclose(runtimes);
-+
-+    time4 = get_time();
-+
-+	printf("CUDA error: %s\n", cudaGetErrorString(cudaGetLastError()));
  
- 	//================================================================================80
- 	//		COPY DATA BACK TO CPU
-@@ -238,6 +286,7 @@
- 
- 	cudaMemcpy(x, d_x, x_mem, cudaMemcpyDeviceToHost);
- 	cudaMemcpy(y, d_y, y_mem, cudaMemcpyDeviceToHost);
-+    cudaThreadSynchronize();
- 
- 	time5 = get_time();
- 
-@@ -311,6 +360,8 @@
- 	printf("Total time:\n");
- 	printf("%.12f s\n", 																											(float) (time6-time0) / 1000000);
- 
-+    fprintf(stderr, "%.8f\n", (float)(time4-time3));
-+
- //====================================================================================================100
- //		END OF FILE
- //====================================================================================================100
+ 	// cudaThreadSynchronize();
+ 	// printf("CUDA error: %s\n", cudaGetErrorString(cudaGetLastError()));
 Only in rodinia_3.1-patched/opencl/backprop: backprop
 Only in rodinia_3.1-patched/opencl/backprop: backprop.o
 diff -ru rodinia_3.1/opencl/backprop/backprop_ocl.cpp rodinia_3.1-patched/opencl/backprop/backprop_ocl.cpp
