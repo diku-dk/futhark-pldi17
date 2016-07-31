@@ -1,5 +1,6 @@
 runtimes
 tools
+input
 
 # Ignore downloaded and extracted Rodinia
 rodinia_3.1

@@ -3,108 +3,178 @@ RODINIA_MD5=047d983e62107972f217921aa0027b05  rodinia_3.1.tar.bz2
 RUNS=10
 
 RODINIA_BENCHMARKS=srad hotspot nn backprop cfd kmeans lavaMD pathfinder myocyte
+ACCELERATE_BENCHMARKS=fluid mandelbrot nbody crystal
 
 .SECONDARY:
 
-all: $(RODINIA_BENCHMARKS:%=runtimes/%.speedup)
+all: benchmark_rodinia benchmark_accelerate
+
+benchmark_rodinia: $(RODINIA_BENCHMARKS:%=runtimes/%.speedup)
+
+benchmark_accelerate: $(ACCELERATE_BENCHMARKS:%=runtimes/%.speedup)
 
 runtimes/%.speedup: runtimes/%-futhark.avgtime runtimes/%-rodinia.avgtime
 	@echo "scale=2; $(shell cat runtimes/$*-rodinia.avgtime) / $(shell cat runtimes/$*-futhark.avgtime)" | bc > $@
 
+runtimes/%.speedup: runtimes/%-futhark.avgtime runtimes/%-accelerate.avgtime
+	@echo "scale=2; $(shell cat runtimes/$*-accelerate.avgtime) / $(shell cat runtimes/$*-futhark.avgtime)" | bc > $@
+
 runtimes/%.avgtime: runtimes/%.runtimes
-	awk '{sum += strtonum($$0) / 1000.0} END{print sum/NR}' < $< > $@
+	@awk '{sum += strtonum($$0) / 1000.0} END{print sum/NR}' < $< > $@
+
+runtimes/%-accelerate.avgtime: runtimes/%-accelerate.csv
+	@tail -n 1 $< | cut -d',' -f2 | awk '{print $$1*1000}' > $@
 
 runtimes/srad-rodinia.runtimes: rodinia_3.1-patched
-	mkdir -p runtimes
+	@mkdir -p runtimes
 	(cd $</opencl/srad && make clean && make && RODINIA_RUNS=$(RUNS) ./run)
 	cp $</opencl/srad/runtimes $@
 
 runtimes/srad-futhark.runtimes: futhark-benchmarks
-	mkdir -p runtimes
+	@mkdir -p runtimes
 	futhark-opencl $</rodinia/srad/srad_core.fut
 	$</rodinia/srad/srad_core -r $(RUNS) -t $@ < $</rodinia/srad/data/image.in > /dev/null
 
 runtimes/hotspot-rodinia.runtimes: rodinia_3.1-patched
-	mkdir -p runtimes
+	@mkdir -p runtimes
 	(cd $</opencl/hotspot && make clean && make && RODINIA_RUNS=$(RUNS) ./run)
 	cp $</opencl/hotspot/runtimes $@
 
 runtimes/hotspot-futhark.runtimes: futhark-benchmarks
-	mkdir -p runtimes
+	@mkdir -p runtimes
 	futhark-opencl $</rodinia/hotspot/hotspot.fut
 	$</rodinia/hotspot/hotspot -r $(RUNS) -t $@ < $</rodinia/hotspot/data/1024.in > /dev/null
 
 runtimes/nn-rodinia.runtimes: rodinia_3.1-patched
-	mkdir -p runtimes
+	@mkdir -p runtimes
 	(cd $</opencl/nn && make clean && make && RODINIA_RUNS=$(RUNS) ./run)
 	cp $</opencl/nn/runtimes $@
 
 runtimes/nn-futhark.runtimes: futhark-benchmarks
-	mkdir -p runtimes
+	@mkdir -p runtimes
 	futhark-opencl $</rodinia/nn/nn.fut
 	$</rodinia/nn/nn -r $(RUNS) -t $@ < $</rodinia/nn/data/medium.in > /dev/null
 
 runtimes/backprop-rodinia.runtimes: rodinia_3.1-patched
-	mkdir -p runtimes
+	@mkdir -p runtimes
 	(cd $</opencl/backprop && make clean && make && RODINIA_RUNS=$(RUNS) ./run)
 	cp $</opencl/backprop/runtimes $@
 
 runtimes/backprop-futhark.runtimes: futhark-benchmarks
-	mkdir -p runtimes
+	@mkdir -p runtimes
 	futhark-opencl $</rodinia/backprop/backprop.fut
 	$</rodinia/backprop/backprop -r $(RUNS) -t $@ < $</rodinia/backprop/data/medium.in > /dev/null
 
 runtimes/cfd-rodinia.runtimes: rodinia_3.1-patched
-	mkdir -p runtimes
+	@mkdir -p runtimes
 	(cd $</opencl/cfd && make clean && make && RODINIA_RUNS=$(RUNS) ./run)
 	cp $</opencl/cfd/runtimes $@
 
 runtimes/cfd-futhark.runtimes: futhark-benchmarks
-	mkdir -p runtimes
+	@mkdir -p runtimes
 	futhark-opencl $</rodinia/cfd/cfd.fut
 	$</rodinia/cfd/cfd -r $(RUNS) -t $@ < $</rodinia/cfd/data/fvcorr.domn.193K.toa > /dev/null
 
 runtimes/kmeans-rodinia.runtimes: rodinia_3.1-patched
-	mkdir -p runtimes
+	@mkdir -p runtimes
 	(cd $</opencl/kmeans && make clean && make && RODINIA_RUNS=$(RUNS) ./run)
 	cp $</opencl/kmeans/runtimes $@
 
 runtimes/kmeans-futhark.runtimes: futhark-benchmarks
-	mkdir -p runtimes
+	@mkdir -p runtimes
 	futhark-opencl $</rodinia/kmeans/kmeans.fut
 	$</rodinia/kmeans/kmeans -r $(RUNS) -t $@ < $</rodinia/kmeans/data/kdd_cup.in > /dev/null
 
 runtimes/lavaMD-rodinia.runtimes: rodinia_3.1-patched
-	mkdir -p runtimes
+	@mkdir -p runtimes
 	(cd $</opencl/lavaMD && make clean && make && RODINIA_RUNS=$(RUNS) ./run)
 	cp $</opencl/lavaMD/runtimes $@
 
 runtimes/lavaMD-futhark.runtimes: futhark-benchmarks
-	mkdir -p runtimes
+	@mkdir -p runtimes
 	futhark-opencl $</rodinia/lavaMD/lavaMD.fut
 	$</rodinia/lavaMD/lavaMD -r $(RUNS) -t $@ < $</rodinia/lavaMD/data/10_boxes.in > /dev/null
 
 runtimes/pathfinder-rodinia.runtimes: rodinia_3.1-patched
-	mkdir -p runtimes
+	@mkdir -p runtimes
 	(cd $</opencl/pathfinder && make clean && make && RODINIA_RUNS=$(RUNS) ./run)
 	cp $</opencl/pathfinder/runtimes $@
 
 runtimes/pathfinder-futhark.runtimes: futhark-benchmarks
-	mkdir -p runtimes
+	@mkdir -p runtimes
 	futhark-opencl $</rodinia/pathfinder/pathfinder.fut
 	$</rodinia/pathfinder/pathfinder -r $(RUNS) -t $@ < $</rodinia/pathfinder/data/medium.in > /dev/null
 
 # Myocyte uses the CUDA version, because the OpenCL one does not
 # support the workload>1 case efficiently.
 runtimes/myocyte-rodinia.runtimes: rodinia_3.1-patched
-	mkdir -p runtimes
+	@mkdir -p runtimes
 	(cd $</cuda/myocyte && make clean && make && RODINIA_RUNS=$(RUNS) ./run)
 	cp $</cuda/myocyte/runtimes $@
 
 runtimes/myocyte-futhark.runtimes: futhark-benchmarks
-	mkdir -p runtimes
+	@mkdir -p runtimes
 	futhark-opencl $</rodinia/myocyte/myocyte.fut
 	$</rodinia/myocyte/myocyte -r $(RUNS) -t $@ < $</rodinia/myocyte/data/medium.in > /dev/null
+
+# Accelerate uses its own internal benchmarking and computes its own
+# averages.
+
+# The following constants define the work size for fluid.
+FLUID_N_STEPS=1
+FLUID_RESOLUTION=3000 # ends up squared
+FLUID_N_SOLVER_STEPS=20
+runtimes/fluid-accelerate.csv:
+	@mkdir -p runtimes
+	accelerate-fluid --cuda --benchmark --csv=$@ \
+	--iterations=$(FLUID_N_SOLVER_STEPS) \
+	--width=$(FLUID_RESOLUTION) \
+	--height=$(FLUID_RESOLUTION)
+
+input/fluid.input:
+	@mkdir -p input
+	futhark-benchmarks/accelerate/fluid/fluid-generate-random-input.py \
+	$(FLUID_N_STEPS) $(FLUID_RESOLUTION) $(FLUID_N_SOLVER_STEPS) futhark none > $@
+
+runtimes/fluid-futhark.runtimes: futhark-benchmarks input/fluid.input
+	@mkdir -p runtimes
+	futhark-opencl futhark-benchmarks/accelerate/fluid/src-futhark/fluid-benchmark.fut
+	futhark-benchmarks/accelerate/fluid/src-futhark/fluid-benchmark -r $(RUNS) -t $@ < input/fluid.input > /dev/null
+
+MANDELBROT_RESOLUTION=4000
+MANDELBROT_LIMIT=255
+runtimes/mandelbrot-accelerate.csv:
+	@mkdir -p runtimes
+	accelerate-mandelbrot --cuda --benchmark --csv=$@ \
+	--width $(MANDELBROT_RESOLUTION) --height $(MANDELBROT_RESOLUTION) --limit $(MANDELBROT_LIMIT)
+
+runtimes/mandelbrot-futhark.runtimes: futhark-benchmarks
+	@mkdir -p runtimes
+	futhark-opencl futhark-benchmarks/accelerate/mandelbrot/mandelbrot.fut
+	echo $(MANDELBROT_RESOLUTION) $(MANDELBROT_RESOLUTION) $(MANDELBROT_LIMIT) -2.23 -1.15 0.83 1.15 | \
+	  futhark-benchmarks/accelerate/mandelbrot/mandelbrot -r $(RUNS) -t $@ > /dev/null
+
+NBODY_N=100000
+runtimes/nbody-accelerate.csv:
+	@mkdir -p runtimes
+	accelerate-nbody --cuda --benchmark -n $(NBODY_N) --csv=$@
+
+runtimes/nbody-futhark.runtimes: futhark-benchmarks
+	@mkdir -p runtimes
+	futhark-opencl futhark-benchmarks/accelerate/nbody/nbody.fut
+	cat futhark-benchmarks/accelerate/nbody/nbody-n_steps=1-n_bodies=$(NBODY_N)-timestep=1.0-epsilon=50.0.in | \
+	  futhark-benchmarks/accelerate/nbody/nbody -r $(RUNS) -t $@ > /dev/null
+
+CRYSTAL_SIZE=2000
+CRYSTAL_DEGREE=50
+runtimes/crystal-accelerate.csv:
+	@mkdir -p runtimes
+	accelerate-crystal --cuda --benchmark --size $(CRYSTAL_SIZE) --degree $(CRYSTAL_DEGREE) --csv=$@
+
+runtimes/crystal-futhark.runtimes: futhark-benchmarks
+	futhark-opencl futhark-benchmarks/accelerate/crystal/crystal.fut
+	echo $(CRYSTAL_SIZE) 30.0 $(CRYSTAL_DEGREE) 1 1.0 | \
+	  futhark-benchmarks/accelerate/crystal/crystal -r $(RUNS) -t $@ > /dev/null
 
 futhark-benchmarks:
 	git clone --depth 1 https://github.com/HIPERFIT/futhark-benchmarks.git
@@ -124,3 +194,4 @@ clean:
 	rm -f rodinia_3.1.tar.bz2
 	rm -rf futhark-benchmarks
 	rm -rf runtimes
+	rm -rf input
