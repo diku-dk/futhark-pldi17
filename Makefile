@@ -4,6 +4,7 @@ RUNS=10
 
 RODINIA_BENCHMARKS=srad hotspot nn backprop cfd kmeans lavaMD pathfinder myocyte
 ACCELERATE_BENCHMARKS=fluid mandelbrot nbody crystal
+FINPAR_BENCHMARKS=LocVolCalib_small LocVolCalib_medium LocVolCalib_large
 
 .SECONDARY:
 
@@ -13,11 +14,16 @@ benchmark_rodinia: $(RODINIA_BENCHMARKS:%=runtimes/%.speedup)
 
 benchmark_accelerate: $(ACCELERATE_BENCHMARKS:%=runtimes/%.speedup)
 
+benchmark_finpar: $(FINPAR_BENCHMARKS:%=runtimes/%.speedup)
+
 runtimes/%.speedup: runtimes/%-futhark.avgtime runtimes/%-rodinia.avgtime
 	@echo "scale=2; $(shell cat runtimes/$*-rodinia.avgtime) / $(shell cat runtimes/$*-futhark.avgtime)" | bc > $@
 
 runtimes/%.speedup: runtimes/%-futhark.avgtime runtimes/%-accelerate.avgtime
 	@echo "scale=2; $(shell cat runtimes/$*-accelerate.avgtime) / $(shell cat runtimes/$*-futhark.avgtime)" | bc > $@
+
+runtimes/%.speedup: runtimes/%-futhark.avgtime runtimes/%-finpar.avgtime
+	@echo "scale=2; $(shell cat runtimes/$*-finpar.avgtime) / $(shell cat runtimes/$*-futhark.avgtime)" | bc > $@
 
 runtimes/%.avgtime: runtimes/%.runtimes
 	@awk '{sum += strtonum($$0) / 1000.0} END{print sum/NR}' < $< > $@
@@ -176,8 +182,25 @@ runtimes/crystal-futhark.runtimes: futhark-benchmarks
 	echo $(CRYSTAL_SIZE) 30.0 $(CRYSTAL_DEGREE) 1 1.0 | \
 	  futhark-benchmarks/accelerate/crystal/crystal -r $(RUNS) -t $@ > /dev/null
 
+runtimes/LocVolCalib_%-finpar.runtimes: finpar
+	@mkdir -p runtimes
+	(cd finpar/LocVolCalib/OutParOpenCLMP; \
+	 make; \
+	 for i in `seq $(RUNS)`; do make run_$* | grep Runtime | cut -f1; done > ../../../$@)
+
+futhark-benchmarks/finpar/LocVolCalib: futhark-benchmarks
+	futhark-opencl futhark-benchmarks/finpar/LocVolCalib.fut
+
+runtimes/LocVolCalib_%-futhark.runtimes: futhark-benchmarks/finpar/LocVolCalib
+	@mkdir -p runtimes
+	cat futhark-benchmarks/finpar/LocVolCalib-data/$*.in | \
+	 futhark-benchmarks/finpar/LocVolCalib -r $(RUNS) -t $@ > /dev/null
+
 futhark-benchmarks:
 	git clone --depth 1 https://github.com/HIPERFIT/futhark-benchmarks.git
+
+finpar:
+	git clone https://github.com/HIPERFIT/finpar.git
 
 rodinia_3.1-patched: rodinia_3.1.tar.bz2
 	@if ! md5sum --quiet -c rodinia_3.1.tar.bz2.md5; then \
