@@ -4,11 +4,11 @@ RUNS=10
 
 RODINIA_BENCHMARKS=srad hotspot nn backprop cfd kmeans lavaMD pathfinder myocyte
 ACCELERATE_BENCHMARKS=fluid mandelbrot nbody crystal
-FINPAR_BENCHMARKS=LocVolCalib_small LocVolCalib_medium LocVolCalib_large
+FINPAR_BENCHMARKS=LocVolCalib_small LocVolCalib_medium LocVolCalib_large OptionPricing_small OptionPricing_medium OptionPricing_large
 
 .SECONDARY:
 
-all: benchmark_rodinia benchmark_accelerate
+all: benchmark_rodinia benchmark_accelerate benchmark_finpar
 
 benchmark_rodinia: $(RODINIA_BENCHMARKS:%=runtimes/%.speedup)
 
@@ -195,6 +195,20 @@ runtimes/LocVolCalib_%-futhark.runtimes: futhark-benchmarks/finpar/LocVolCalib
 	@mkdir -p runtimes
 	cat futhark-benchmarks/finpar/LocVolCalib-data/$*.in | \
 	 futhark-benchmarks/finpar/LocVolCalib -r $(RUNS) -t $@ > /dev/null
+
+runtimes/OptionPricing_%-finpar.runtimes: finpar
+	@mkdir -p runtimes
+	(cd finpar/OptionPricing/CppOpenCL; \
+	 make; \
+	 for i in `seq $(RUNS)`; do make run_$* | grep Runtime | cut -f1; done > ../../../$@)
+
+futhark-benchmarks/finpar/OptionPricing: futhark-benchmarks
+	futhark-opencl futhark-benchmarks/finpar/OptionPricing.fut
+
+runtimes/OptionPricing_%-futhark.runtimes: futhark-benchmarks/finpar/OptionPricing
+	@mkdir -p runtimes
+	cat futhark-benchmarks/finpar/OptionPricing-data/$*.in | \
+	 futhark-benchmarks/finpar/OptionPricing -r $(RUNS) -t $@ > /dev/null
 
 futhark-benchmarks:
 	git clone --depth 1 https://github.com/HIPERFIT/futhark-benchmarks.git
