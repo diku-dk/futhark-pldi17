@@ -9,3 +9,6 @@ rodinia_3.1.tar.bz2
 
 # Ignore Futhark benchmarks
 futhark-benchmarks
+
+# Finpar should not be committed
+finpar
