@@ -30,6 +30,8 @@ accelerate_programs = [("Crystal", "crystal"),
 finpar_programs = [("LocVolCalib", "LocVolCalib_large"),
                    ("OptionPricing", "OptionPricing_large")]
 
+parboil_programs = [("MRI-Q", "mri-q")]
+
 def plotting_info(x):
     name, filename = x
     with open(os.path.join('runtimes', filename + '.speedup')) as f:
@@ -42,7 +44,7 @@ def plotting_info(x):
             aux_speedup = 0.0
         return (name, speedup, aux_speedup)
 
-to_plot = map(plotting_info, rodinia_programs + finpar_programs + accelerate_programs)
+to_plot = map(plotting_info, rodinia_programs + finpar_programs + parboil_programs + accelerate_programs)
 
 program_names = [ name for (name, _, _) in to_plot ]
 program_speedups = [ speedup for (_, speedup, _) in to_plot ]
@@ -65,7 +67,7 @@ ind = width+np.concatenate(([0], np.cumsum(spaces)[:-1]))
 fig, ax = plt.subplots()
 
 font = {'family': 'normal',
-        'size' : 10}
+        'size' : 9}
 plt.rc('font', **font)
 grey='#aaaaaa'
 

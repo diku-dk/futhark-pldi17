@@ -1,20 +1,28 @@
 RODINIA_URL=http://www.cs.virginia.edu/~kw5na/lava/Rodinia/Packages/Current/rodinia_3.1.tar.bz2
 RODINIA_MD5=047d983e62107972f217921aa0027b05  rodinia_3.1.tar.bz2
+
+# Parboil insists on some click-through license, so you'll have to get
+# it on your own.
+PARBOIL_LOCATION=$(HOME)/parboil
+
 RUNS=10
 
 RODINIA_BENCHMARKS=srad hotspot nn backprop cfd kmeans lavaMD pathfinder myocyte
 ACCELERATE_BENCHMARKS=fluid mandelbrot nbody crystal
 FINPAR_BENCHMARKS=LocVolCalib_small LocVolCalib_medium LocVolCalib_large OptionPricing_small OptionPricing_medium OptionPricing_large
+PARBOIL_BENCHMARKS=mri-q
 
 .SECONDARY:
 
-all: benchmark_rodinia benchmark_accelerate benchmark_finpar
+all: benchmark_rodinia benchmark_accelerate benchmark_finpar benchmark_parboil
 
 benchmark_rodinia: $(RODINIA_BENCHMARKS:%=runtimes/%.speedup)
 
 benchmark_accelerate: $(ACCELERATE_BENCHMARKS:%=runtimes/%.speedup)
 
 benchmark_finpar: $(FINPAR_BENCHMARKS:%=runtimes/%.speedup)
+
+benchmark_parboil: $(PARBOIL_BENCHMARKS:%=runtimes/%.speedup)
 
 speedup.pdf: benchmark_rodinia benchmark_accelerate benchmark_finpar
 	python tools/plot.py $@
@@ -27,6 +35,10 @@ runtimes/%.speedup: runtimes/%-futhark.avgtime runtimes/%-accelerate.avgtime
 
 runtimes/%.speedup: runtimes/%-futhark.avgtime runtimes/%-finpar.avgtime
 	@echo "scale=2; $(shell cat runtimes/$*-finpar.avgtime) / $(shell cat runtimes/$*-futhark.avgtime)" | bc > $@
+
+runtimes/%.speedup: runtimes/%-futhark.avgtime runtimes/%-parboil.avgtime
+	@echo "scale=2; $(shell cat runtimes/$*-parboil.avgtime) / $(shell cat runtimes/$*-futhark.avgtime)" | bc > $@
+
 
 runtimes/%.avgtime: runtimes/%.runtimes
 	@awk '{sum += strtonum($$0) / 1000.0} END{print sum/NR}' < $< > $@
@@ -212,6 +224,30 @@ runtimes/OptionPricing_%-futhark.runtimes: futhark-benchmarks/finpar/OptionPrici
 	@mkdir -p runtimes
 	cat futhark-benchmarks/finpar/OptionPricing-data/$*.in | \
 	 futhark-benchmarks/finpar/OptionPricing -r $(RUNS) -t $@ > /dev/null
+
+runtimes/mri-q-parboil.runtimes:
+	@mkdir -p runtimes
+	(cd $(PARBOIL_LOCATION); \
+	for i in `seq $(RUNS)`; do \
+	 ./parboil run mri-q opencl large | awk '/^Kernel/{print int($$3*1000000)}'; \
+        done) > $@
+
+runtimes/mri-q-futhark.runtimes:
+	@mkdir -p runtimes
+	futhark-opencl futhark-benchmarks/parboil/mri-q/mri-q.fut
+	cat futhark-benchmarks/parboil/mri-q/data/large.in | futhark-benchmarks/parboil/mri-q/mri-q -r $(RUNS) -t $@ > /dev/null
+
+runtimes/sgemm-parboil.runtimes:
+	@mkdir -p runtimes
+	(cd $(PARBOIL_LOCATION); \
+	for i in `seq $(RUNS)`; do \
+	 ./parboil run sgemm cuda medium | awk '/^Kernel/{print int($$3*1000000)}'; \
+        done) > $@
+
+runtimes/sgemm-futhark.runtimes:
+	@mkdir -p runtimes
+	futhark-opencl futhark-benchmarks/parboil/sgemm/sgemm.fut
+	cat futhark-benchmarks/parboil/sgemm/data/medium.in | futhark-benchmarks/parboil/sgemm/sgemm -r $(RUNS) -t $@ > /dev/null
 
 futhark-benchmarks:
 	git clone --depth 1 https://github.com/HIPERFIT/futhark-benchmarks.git
