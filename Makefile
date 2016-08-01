@@ -16,6 +16,9 @@ benchmark_accelerate: $(ACCELERATE_BENCHMARKS:%=runtimes/%.speedup)
 
 benchmark_finpar: $(FINPAR_BENCHMARKS:%=runtimes/%.speedup)
 
+speedup.pdf: benchmark_rodinia benchmark_accelerate benchmark_finpar
+	python tools/plot.py $@
+
 runtimes/%.speedup: runtimes/%-futhark.avgtime runtimes/%-rodinia.avgtime
 	@echo "scale=2; $(shell cat runtimes/$*-rodinia.avgtime) / $(shell cat runtimes/$*-futhark.avgtime)" | bc > $@
 
