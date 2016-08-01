@@ -58,7 +58,7 @@ Only in rodinia_3.1-patched/opencl/backprop: backprop
 Only in rodinia_3.1-patched/opencl/backprop: backprop.o
 diff -ru rodinia_3.1/opencl/backprop/backprop_ocl.cpp rodinia_3.1-patched/opencl/backprop/backprop_ocl.cpp
 --- rodinia_3.1/opencl/backprop/backprop_ocl.cpp	2015-12-11 16:46:38.000000000 +0100
-+++ rodinia_3.1-patched/opencl/backprop/backprop_ocl.cpp	2016-07-22 22:43:01.234669669 +0200
++++ rodinia_3.1-patched/opencl/backprop/backprop_ocl.cpp	2016-08-01 09:10:33.877692010 +0200
 @@ -12,6 +12,7 @@
  	#include <CL/cl.h>
  #endif
@@ -67,10 +67,22 @@ diff -ru rodinia_3.1/opencl/backprop/backprop_ocl.cpp rodinia_3.1-patched/opencl
  
  ////////////////////////////////////////////////////////////////////////////////
  
-@@ -183,6 +184,13 @@
+@@ -181,15 +182,23 @@
+ 	if(err != CL_SUCCESS) { printf("ERROR: clCreateBuffer hidden_delta_ocl\n"); return -1;}
+ 	input_prev_weights_ocl = clCreateBuffer(context, CL_MEM_READ_WRITE, (in + 1) * (hid + 1) * sizeof(float), NULL, &err );
  	if(err != CL_SUCCESS) { printf("ERROR: clCreateBuffer input_prev_weights_ocl\n"); return -1;}
- 		
- 	printf("Performing GPU computation\n");
+-		
+-	printf("Performing GPU computation\n");
+-	
++
+ 	//write buffers
+ 	err = clEnqueueWriteBuffer(cmd_queue, input_ocl, 1, 0, (in + 1) * sizeof(float), net->input_units, 0, 0, 0);
+ 	if(err != CL_SUCCESS) { printf("ERROR: clEnqueueWriteBuffer input_ocl\n"); return -1; }
+ 	err = clEnqueueWriteBuffer(cmd_queue, input_hidden_ocl, 1, 0, (in + 1) * (hid + 1) * sizeof(float), input_weights_one_dim, 0, 0, 0);
+ 	if(err != CL_SUCCESS) { printf("ERROR: clEnqueueWriteBuffer input_hidden_ocl\n"); return -1; }
+  
++		
++	printf("Performing GPU computation\n");
 +
 +        int run;
 +        int runs = atoi(getenv("RODINIA_RUNS"));
@@ -78,10 +90,11 @@ diff -ru rodinia_3.1/opencl/backprop/backprop_ocl.cpp rodinia_3.1-patched/opencl
 +
 +        for (run = 0; run < runs; run++) {
 +          gettimeofday(&t_start, NULL);
- 	
- 	//write buffers
- 	err = clEnqueueWriteBuffer(cmd_queue, input_ocl, 1, 0, (in + 1) * sizeof(float), net->input_units, 0, 0, 0);
-@@ -235,7 +243,13 @@
++	
+ 	clSetKernelArg(kernel1, 0, sizeof(void *), (void*) &input_ocl);
+ 	clSetKernelArg(kernel1, 1, sizeof(void *), (void*) &output_hidden_ocl);
+ 	clSetKernelArg(kernel1, 2, sizeof(void *), (void*) &input_hidden_ocl);
+@@ -235,7 +244,13 @@
  	clSetKernelArg(kernel2, 5, sizeof(void *), (void*) &input_prev_weights_ocl );
    
  	err = clEnqueueNDRangeKernel(cmd_queue, kernel2, 2, NULL, global_work, local_work, 0, 0, 0);
