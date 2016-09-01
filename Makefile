@@ -53,8 +53,8 @@ runtimes/srad-rodinia.runtimes: rodinia_3.1-patched
 
 runtimes/srad-futhark.runtimes: futhark-benchmarks
 	@mkdir -p runtimes
-	futhark-opencl $</rodinia/srad/srad_core.fut
-	$</rodinia/srad/srad_core -r $(RUNS) -t $@ < $</rodinia/srad/data/image.in > /dev/null
+	futhark-opencl $</rodinia/srad/srad.fut
+	$</rodinia/srad/srad -r $(RUNS) -t $@ < $</rodinia/srad/data/image.in > /dev/null
 
 runtimes/hotspot-rodinia.runtimes: rodinia_3.1-patched
 	@mkdir -p runtimes
