@@ -139,7 +139,8 @@ runtimes/myocyte-futhark.runtimes: futhark-benchmarks
 	$</rodinia/myocyte/myocyte -r $(RUNS) -t $@ < $</rodinia/myocyte/data/medium.in > /dev/null
 
 # Accelerate uses its own internal benchmarking and computes its own
-# averages.
+# averages.  Hack: Some of these benchmarks terminate incorrectly with
+# 'Not a valid Unicode code point!', so we ignore their exit code.
 
 # The following constants define the work size for fluid.
 FLUID_N_STEPS=1
@@ -150,7 +151,7 @@ runtimes/fluid-accelerate.csv:
 	accelerate-fluid --cuda --benchmark --csv=$@ \
 	--iterations=$(FLUID_N_SOLVER_STEPS) \
 	--width=$(FLUID_RESOLUTION) \
-	--height=$(FLUID_RESOLUTION)
+	--height=$(FLUID_RESOLUTION) || true
 
 input/fluid.input:
 	@mkdir -p input
@@ -167,7 +168,7 @@ MANDELBROT_LIMIT=255
 runtimes/mandelbrot-accelerate.csv:
 	@mkdir -p runtimes
 	accelerate-mandelbrot --cuda --benchmark --csv=$@ \
-	--width $(MANDELBROT_RESOLUTION) --height $(MANDELBROT_RESOLUTION) --limit $(MANDELBROT_LIMIT)
+	--width $(MANDELBROT_RESOLUTION) --height $(MANDELBROT_RESOLUTION) --limit $(MANDELBROT_LIMIT) || true
 
 runtimes/mandelbrot-futhark.runtimes: futhark-benchmarks
 	@mkdir -p runtimes
@@ -178,7 +179,7 @@ runtimes/mandelbrot-futhark.runtimes: futhark-benchmarks
 NBODY_N=100000
 runtimes/nbody-accelerate.csv:
 	@mkdir -p runtimes
-	accelerate-nbody --cuda --benchmark -n $(NBODY_N) --csv=$@
+	accelerate-nbody --cuda --benchmark -n $(NBODY_N) --csv=$@ || true
 
 runtimes/nbody-futhark.runtimes: futhark-benchmarks
 	@mkdir -p runtimes
@@ -190,7 +191,7 @@ CRYSTAL_SIZE=2000
 CRYSTAL_DEGREE=50
 runtimes/crystal-accelerate.csv:
 	@mkdir -p runtimes
-	accelerate-crystal --cuda --benchmark --size $(CRYSTAL_SIZE) --degree $(CRYSTAL_DEGREE) --csv=$@
+	accelerate-crystal --cuda --benchmark --size $(CRYSTAL_SIZE) --degree $(CRYSTAL_DEGREE) --csv=$@ || true
 
 runtimes/crystal-futhark.runtimes: futhark-benchmarks
 	futhark-opencl futhark-benchmarks/accelerate/crystal/crystal.fut
