@@ -44,7 +44,7 @@ def plotting_info(x):
             aux_speedup = 0.0
         return (name, speedup, aux_speedup)
 
-to_plot = map(plotting_info, rodinia_programs + finpar_programs + parboil_programs + accelerate_programs)
+to_plot = list(map(plotting_info, rodinia_programs + finpar_programs + parboil_programs + accelerate_programs))
 
 program_names = [ name for (name, _, _) in to_plot ]
 program_speedups = [ speedup for (_, speedup, _) in to_plot ]
@@ -59,7 +59,7 @@ def compute_space(x):
         return width*2
     else:
         return width*3
-spaces = np.array(map(compute_space, to_plot))
+spaces = np.array(list(map(compute_space, to_plot)))
 
 # the x locations for the bars
 ind = width+np.concatenate(([0], np.cumsum(spaces)[:-1]))
