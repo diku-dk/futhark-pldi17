@@ -96,8 +96,8 @@ for t in ax.get_xticklabels( ):
     else:
         stagger = 0
 
-rects = ax.bar(ind, program_speedups, width, color='#2255ee', zorder=3, edgecolor='white')
-aux_rects = ax.bar(ind+width, program_aux_speedups, width, color='#ee5500', zorder=3, edgecolor='white')
+rects = ax.bar(ind, program_speedups, width, color='#2255ee', zorder=3, edgecolor='white', label='GTX 780')
+aux_rects = ax.bar(ind+width, program_aux_speedups, width, color='#ee5500', zorder=3, edgecolor='white', label='W8100')
 
 def label_rect(rect):
     height = rect.get_height()
@@ -116,6 +116,7 @@ def label_rect(rect):
 
 map(label_rect, rects)
 map(label_rect, aux_rects)
+ax.legend(bbox_to_anchor=(0., 1.15, 1., .115), loc=3, ncol=2, borderaxespad=0.)
 
 fig.set_size_inches(8.5, 1.5)
 plt.rc('text')
