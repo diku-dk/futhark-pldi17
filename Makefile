@@ -27,6 +27,9 @@ benchmark_parboil: $(PARBOIL_BENCHMARKS:%=runtimes/%.speedup)
 speedup.pdf: benchmark_rodinia benchmark_accelerate benchmark_finpar
 	python tools/plot.py $@
 
+runtimes.tex: benchmark_rodinia benchmark_accelerate benchmark_finpar
+	python tools/table.py > $@ || rm -f $@
+
 runtimes/%.speedup: runtimes/%-futhark.avgtime runtimes/%-rodinia.avgtime
 	@echo "scale=2; $(shell cat runtimes/$*-rodinia.avgtime) / $(shell cat runtimes/$*-futhark.avgtime)" | bc > $@
 
