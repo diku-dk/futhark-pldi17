@@ -1,6 +1,7 @@
 runtimes
 input
 speedup.pdf
+runtimes.tex
 
 # Ignore downloaded and extracted Rodinia
 rodinia_3.1
