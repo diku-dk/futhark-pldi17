@@ -24,10 +24,10 @@ benchmark_finpar: $(FINPAR_BENCHMARKS:%=runtimes/%.speedup)
 
 benchmark_parboil: $(PARBOIL_BENCHMARKS:%=runtimes/%.speedup)
 
-speedup.pdf: benchmark_rodinia benchmark_accelerate benchmark_finpar
+speedup.pdf: benchmark_rodinia benchmark_accelerate benchmark_finpar benchmark_parboil
 	python tools/plot.py $@
 
-runtimes.tex: benchmark_rodinia benchmark_accelerate benchmark_finpar
+runtimes.tex: benchmark_rodinia benchmark_accelerate benchmark_finpar benchmark_parboil
 	python tools/table.py > $@ || rm -f $@
 
 runtimes/%.speedup: runtimes/%-futhark.avgtime runtimes/%-rodinia.avgtime
