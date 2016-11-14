@@ -39,7 +39,8 @@ def fut_filename(d, filename):
 def get_avgtimes(d, ref_filename, filename):
     with open(ref_filename(d, filename)) as ref_f:
         with open(fut_filename(d, filename)) as fut_f:
-            return (ref_f.read().strip(), fut_f.read().strip())
+            return ('%.1f' % float(ref_f.read()),
+                    '%.1f' % float(fut_f.read()))
 
 
 def table_info_closure(ref_filename):
@@ -60,7 +61,7 @@ to_table = list(map(table_info_closure(ref_filename_closure('rodinia')), rodinia
 
 print(r'''
 \begin{tabular}{lrrrr}
-& \multicolumn{2}{c}{\textbf{NVIDIA}} & \multicolumn{2}{c}{\textbf{AMD}} \\
+& \multicolumn{2}{c}{\textbf{NVIDIA GTX780}} & \multicolumn{2}{c}{\textbf{AMD W8100}} \\
 \textbf{Benchmark} & \textbf{Ref.} & \textbf{Futhark} & \textbf{Ref.} & \textbf{Futhark}\\
 ''')
 
