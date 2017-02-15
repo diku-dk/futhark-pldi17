@@ -13,7 +13,10 @@ the execution of Futhark implementations of various benchmarks, as
 well as running the originals and computing and visualising relative
 speedups.  The repository does not itself contain the Futhark compiler
 or any benchmarks.  Some of these will be downloaded automatically,
-but others must be installed manually (see below).
+but others must be installed manually (see below).  The intent is to
+make it clear how we have modified the reference implementations.  In
+practice, we only modify Rodinia, via the file
+`rodinia_3.1-some-instrumentation.patch`.
 
 This infrastructure depends not only on the Futhark compiler itself,
 but also on four third-party benchmark suites (Rodinia, Parboil,
