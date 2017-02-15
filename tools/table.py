@@ -45,19 +45,24 @@ def get_avgtimes(d, ref_filename, filename):
 
 def table_info_closure(ref_filename):
     def table_info(x):
-        name, filename = x
-        (ref_avgtime, fut_avgtime) = get_avgtimes('runtimes', ref_filename, filename)
         try:
-            (aux_ref_avgtime, aux_fut_avgtime) = get_avgtimes('aux_runtimes', ref_filename, filename)
-            return (name, ref_avgtime, fut_avgtime, aux_ref_avgtime, aux_fut_avgtime)
+            name, filename = x
+            (ref_avgtime, fut_avgtime) = get_avgtimes('runtimes', ref_filename, filename)
+            try:
+                (aux_ref_avgtime, aux_fut_avgtime) = get_avgtimes('aux_runtimes', ref_filename, filename)
+                return (name, ref_avgtime, fut_avgtime, aux_ref_avgtime, aux_fut_avgtime)
+            except:
+                return (name, ref_avgtime, fut_avgtime, '---', '---')
         except:
-            return (name, ref_avgtime, fut_avgtime, '---', '---')
+            print('Skipping %s as the file could not be opened.' % ref_filename)
+            return None
     return table_info
 
-to_table = list(map(table_info_closure(ref_filename_closure('rodinia')), rodinia_programs) +
-                map(table_info_closure(ref_filename_closure('finpar')), finpar_programs) +
-                map(table_info_closure(ref_filename_closure('parboil')), parboil_programs) +
-                map(table_info_closure(ref_filename_closure('accelerate')), accelerate_programs))
+to_table = list(filter(lambda x: x is not None,
+                       map(table_info_closure(ref_filename_closure('rodinia')), rodinia_programs) +
+                       map(table_info_closure(ref_filename_closure('finpar')), finpar_programs) +
+                       map(table_info_closure(ref_filename_closure('parboil')), parboil_programs) +
+                       map(table_info_closure(ref_filename_closure('accelerate')), accelerate_programs)))
 
 print(r'''
 \begin{tabular}{lrrrr}
