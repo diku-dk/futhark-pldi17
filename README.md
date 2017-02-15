@@ -4,22 +4,35 @@ Experimentation Infrastructure for PLDI 2017 Paper
 This repository contains scripts and benchmarks for reproducing the
 empirical evaluation of the paper *Futhark: Purely Functional
 GPU-programming with Nested Parallelism and In-place Array Updates*,
-to appear at PLDI 2017.  This infrastructure depends not only on the
-Futhark compiler itself, but also on four third-party benchmark suites
-(Rodinia, Parboil, FinPar, and Accelerate), the GPU setup on the host
-system, and some Python libraries for automatic plot generation.  In
-an attempt to alleviate the situation, we have put effort into
-documenting the dependencies and creating workarounds for disabling
-parts of the infrastructure.  Please read this document carefully or
-you are likely to have a bad time.  This infrastructure works only on
-Linux, and Some Linux knowhow is likely necessary to follow these
-instructions.
+to appear at PLDI 2017.  The primary research artifact of our work is
+the Futhark compiler itself, which is [freely
+available](https://github.com/HIPERFIT/futhark) and has
+[documentation](https://futhark.readthedocs.io/en/latest/).  This
+repository contains infrastructure, hacks, and tools for orchestrating
+the execution of Futhark implementations of various benchmarks, as
+well as running the originals and computing and visualising relative
+speedups.  The repository does not itself contain the Futhark compiler
+or any benchmarks.  Some of these will be downloaded automatically,
+but others must be installed manually (see below).
+
+This infrastructure depends not only on the Futhark compiler itself,
+but also on four third-party benchmark suites (Rodinia, Parboil,
+FinPar, and Accelerate), the GPU setup on the host system, and some
+Python libraries for automatic plot generation.  In an attempt to
+alleviate the situation, we have put effort into documenting the
+dependencies and creating workarounds for disabling parts of the
+infrastructure.  Please read this document carefully or you are likely
+to have a bad time.  This infrastructure works only on Linux, and some
+Linux knowhow is likely necessary to follow these instructions.
 
 The main interface to the infrastructure is `make`.  The makefile
 contains various targets for running sub-parts of the infrastructure,
 so even if not everything works (or you don't want to bother with
 installing the more complicated parts), you can still get partial
-results.  The valid targets are listed below.
+results.  The valid targets are listed at the end of this guide.
+
+Running all the benchmarks should take less than an hour, depending on
+the speed of your system.
 
 System Requirements
 -------------------
@@ -103,7 +116,8 @@ often be manually configured with respect to include paths.  The
 makefile assumes that the environment variable `PARBOIL_LOCATION`
 points to a working Parboil setup (defaults to `$HOME/parboil` if the
 variable is not set).  This infrastructure has been tested with
-Parboil 2.5.
+Parboil 2.5.  You can run `make sanity_check_parboil` to check whether
+your Parboil setup works.
 
 [Parboil]: http://impact.crhc.illinois.edu/parboil/parboil.aspx
 
@@ -166,3 +180,9 @@ There are several other makefile targets available:
   `make benchmark_opencl`: Run all the benchmarks that require only
   OpenCL.  This is the target you want if you are running on a
   non-NVIDIA system.
+
+  `make sanity_check`: Check whether simple OpenCL and CUDA programs
+  can be executed and run.
+
+  `make sanity_check_parboil`: Check whether Parboil is available and
+  working.

@@ -282,6 +282,10 @@ sanity_check:
 	sanity/cuda
 	@echo Sanity-checking succeeded.  You will probably be able to compile and run the benchmarks.
 
+sanity_check_parboil:
+	cd $(PARBOIL_LOCATION) && ./parboil run sgemm opencl_base small
+	cd $(PARBOIL_LOCATION) && ./parboil run sgemm cuda small
+
 clean:
 	rm -rf rodinia_3.1
 	rm -f rodinia_3.1.tar.bz2
