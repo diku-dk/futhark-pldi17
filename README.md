@@ -52,7 +52,7 @@ the following is often necessary:
     export LD_LIBRARY_PATH=/usr/local/cuda/lib64/:$LD_LIBRARY_PATH
 
 OpenCL/CUDA Device Selection
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 All Futhark programs, and most of the benchmarks, interact with the
 GPU through the OpenCL library, which must be installed and working.
@@ -69,8 +69,24 @@ the state of the OpenCL setup.
 
 [clinfo]: https://github.com/Oblomov/clinfo
 
+Futhark requirements
+--------------------
+
+The Futhark compiler has its own [installation instructions][].  If
+you follow these, the necessary binaries will be in
+`$HOME/.local/bin`, which must be added to the `PATH`.  The
+`[futhark-benchmarks][]` repository will be automatically downloaded,
+but note that it always downloads the *newest* version of the
+repository.  If you want the version that was available when this
+document was written, you must subsequently enter the
+`futhark-benchmarks` directory and check out commit
+`286025cd1fa3c20b892a09fb50273fc0a9a365c2`.
+
+[installation instructions]: https://futhark.readthedocs.io/en/latest/installation.html
+[futhark-benchmarks]: https://github.com/HIPERFIT/futhark-benchmarks
+
 Rodinia requirements
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 The makefile automatically downloads the appropriate version of
 [Rodinia][] and patches the relevant benchmarks with instrumentation code.
@@ -78,7 +94,7 @@ The makefile automatically downloads the appropriate version of
 [Rodinia]: http://lava.cs.virginia.edu/Rodinia/download_links.htm
 
 Parboil requirements
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 [Parboil][] requires a click-through license and so cannot be
 automatically downloaded by the makefile.  Futhermore, Parboil must
@@ -91,7 +107,7 @@ Parboil 2.5.
 [Parboil]: http://impact.crhc.illinois.edu/parboil/parboil.aspx
 
 Accelerate requirements
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 Our Accelerate benchmarks come from [accelerate-examples][].
 Accelerate has its own installation instructions.  If you follow
@@ -101,7 +117,7 @@ must be added to the `PATH`.
 [accelerate-examples]: https://github.com/AccelerateHS/accelerate-examples/
 
 FinPar requirements
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 Like Rodinia, [FinPar][] is automatically downloaded.
 
