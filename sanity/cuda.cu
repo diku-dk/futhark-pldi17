@@ -22,8 +22,6 @@ int main()
   const int csize = N*sizeof(char);
   const int isize = N*sizeof(int);
 
-  printf("%s", a);
-
   cudaMalloc( (void**)&ad, csize );
   cudaMalloc( (void**)&bd, isize );
   cudaMemcpy( ad, a, csize, cudaMemcpyHostToDevice );
@@ -36,7 +34,7 @@ int main()
   cudaFree( ad );
   cudaFree( bd );
 
-  assert(strcmp(a, "Hello World!"));
+  assert(strcmp(a, "World!") == 0);
 
   return 0;
 }
