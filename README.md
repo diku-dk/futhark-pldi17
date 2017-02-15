@@ -1,14 +1,14 @@
-Experimentation Infrastructure for PLDI 2017 Futhark Paper
+Experimentation Infrastructure for PLDI 2017 Paper
 ==
 
 This repository contains scripts and benchmarks for reproducing the
 empirical evaluation of the paper *Futhark: Purely Functional
 GPU-programming with Nested Parallelism and In-place Array Updates*,
-to appear in PLDI 2017.  This infrastructure depends not only on the
-Futhark compiler, but also on three third-party benchmark suites
-(Rodinia, Parboil, and Accelerate), the GPU setup on the host system,
-and some Python libraries for automatic plot generation.  In an
-attempt to alleviate the situation, we have put effort into
+to appear at PLDI 2017.  This infrastructure depends not only on the
+Futhark compiler itself, but also on four third-party benchmark suites
+(Rodinia, Parboil, FinPar, and Accelerate), the GPU setup on the host
+system, and some Python libraries for automatic plot generation.  In
+an attempt to alleviate the situation, we have put effort into
 documenting the dependencies and creating workarounds for disabling
 parts of the infrastructure.  Please read this document carefully or
 you are likely to have a bad time.  Some Unix knowhow is likely
