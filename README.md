@@ -11,8 +11,9 @@ system, and some Python libraries for automatic plot generation.  In
 an attempt to alleviate the situation, we have put effort into
 documenting the dependencies and creating workarounds for disabling
 parts of the infrastructure.  Please read this document carefully or
-you are likely to have a bad time.  Some Unix knowhow is likely
-necessary to follow these instructions.
+you are likely to have a bad time.  This infrastructure works only on
+Linux, and Some Linux knowhow is likely necessary to follow these
+instructions.
 
 The main interface to the infrastructure is `make`.  The makefile
 contains various targets for running sub-parts of the infrastructure,
