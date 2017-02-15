@@ -45,8 +45,8 @@ def get_avgtimes(d, ref_filename, filename):
 
 def table_info_closure(ref_filename):
     def table_info(x):
+        name, filename = x
         try:
-            name, filename = x
             (ref_avgtime, fut_avgtime) = get_avgtimes('runtimes', ref_filename, filename)
             try:
                 (aux_ref_avgtime, aux_fut_avgtime) = get_avgtimes('aux_runtimes', ref_filename, filename)
@@ -54,7 +54,7 @@ def table_info_closure(ref_filename):
             except:
                 return (name, ref_avgtime, fut_avgtime, '---', '---')
         except:
-            print('Skipping %s as the file could not be opened.' % ref_filename)
+            sys.stderr.write('Skipping %s as the file could not be opened.\n' % name)
             return None
     return table_info
 
