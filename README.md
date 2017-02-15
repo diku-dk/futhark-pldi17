@@ -175,7 +175,7 @@ There are several other makefile targets available:
   compute its speedup.  *foo* can be one of `srad`, `hotspot`, `nn`,
   `backprop`, `cfd`, `kmeans`, `lavaMD`, `pathfinder`, `myocyte`,
   `fluid`, `mandelbrot`, `nbody`, `crystal`, `LocVolCalib_large`,
-  `OptionPricing_large`, `mri-q`, `sgemm`.
+  `OptionPricing_large`, `mri-q`.
 
   `make benchmark_opencl`: Run all the benchmarks that require only
   OpenCL.  This is the target you want if you are running on a

@@ -254,11 +254,6 @@ runtimes/sgemm-parboil.runtimes:
 	 ./parboil run sgemm cuda medium | awk '/^Kernel/{print int($$3*1000000)}'; \
         done) > $@
 
-runtimes/sgemm-futhark.runtimes:
-	@mkdir -p runtimes
-	futhark-opencl futhark-benchmarks/parboil/sgemm/sgemm.fut
-	cat futhark-benchmarks/parboil/sgemm/data/medium.in | futhark-benchmarks/parboil/sgemm/sgemm -r $(RUNS) -t $@ > /dev/null
-
 futhark-benchmarks:
 	git clone --depth 1 https://github.com/HIPERFIT/futhark-benchmarks.git
 
@@ -284,7 +279,7 @@ sanity_check:
 
 sanity_check_parboil:
 	cd $(PARBOIL_LOCATION) && ./parboil run sgemm opencl_base small
-	cd $(PARBOIL_LOCATION) && ./parboil run sgemm cuda small
+	@echo Parboil sanity-checking succeeded.  You will probably be able to compile and run the Parboil benchmarks.
 
 clean:
 	rm -rf rodinia_3.1
