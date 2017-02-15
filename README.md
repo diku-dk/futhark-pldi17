@@ -1,14 +1,151 @@
+Experimentation Infrastructure for PLDI 2017 Futhark Paper
+==
+
+This repository contains scripts and benchmarks for reproducing the
+empirical evaluation of the paper *Futhark: Purely Functional
+GPU-programming with Nested Parallelism and In-place Array Updates*,
+to appear in PLDI 2017.  This infrastructure depends not only on the
+Futhark compiler, but also on three third-party benchmark suites
+(Rodinia, Parboil, and Accelerate), the GPU setup on the host system,
+and some Python libraries for automatic plot generation.  In an
+attempt to alleviate the situation, we have put effort into
+documenting the dependencies and creating workarounds for disabling
+parts of the infrastructure.  Please read this document carefully or
+you are likely to have a bad time.  Some Unix knowhow is likely
+necessary to follow these instructions.
+
+The main interface to the infrastructure is `make`.  The makefile
+contains various targets for running sub-parts of the infrastructure,
+so even if not everything works (or you don't want to bother with
+installing the more complicated parts), you can still get partial
+results.  The valid targets are listed below.
+
 System Requirements
 -------------------
 
- * Basic Unix tools: `patch`, `md5sum`.
+Every program mentioned below must be available in `PATH`.  You can
+modify the `PATH` (and other environment variables) before running
+`make`.
 
- * `python3` with a working Matplotlib and Numpy.  For Parboil to
-   work, it is important that plain `python` is a Python 2.
+ * A Unix system with basic tools: `patch`, `md5sum`.
+
+ * `python3` with a working Matplotlib and Numpy.  **For Parboil to
+   work, it is important that plain `python` is a Python 2.**
 
  * Some Accelerate examples: `accelerate-nbody`,
    `accelerate-crystal`, `accelerate-mandelbrot`, `accelerate-fluid`.
 
  * `futhark-opencl`.
 
-Maybe more.
+The system must be able to compile OpenCL and CUDA programs with `gcc`
+without requiring any special compiler directives or include paths.
+That is, `gcc opencl_test.c -lOpenCL` and `nvcc cuda_test.cu` must
+work.  You can run `make sanity_check` to quickly check whether your
+system is capable of this.  You may have to modify the environment
+variables `CPATH`, `LIBRARY_PATH`, and `LD_LIBRARY_PATH` to point to
+the appropriate locations locations.  For example, on NVIDIA systems,
+the following is often necessary:
+
+    export PATH=/usr/local/cuda/bin:$PATH
+    export CPATH=/usr/local/cuda/include:$CPATH
+    export LIBRARY_PATH=/usr/local/cuda/lib64:$LIBRARY_PATH
+    export LD_LIBRARY_PATH=/usr/local/cuda/lib64/:$LD_LIBRARY_PATH
+
+OpenCL/CUDA Device Selection
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+All Futhark programs, and most of the benchmarks, interact with the
+GPU through the OpenCL library, which must be installed and working.
+A few (in particular Accelerate) use NVIDIAs CUDA.  For OpenCL, most
+benchmarks will pick the first OpenCL platform and device found.  Some
+will explicitly only look for devices that register themselves as
+GPUs; whereas others (including Futhark) are less picky, and will
+happily run on an OpenCL CPU device.  It is advisable to ensure that
+only one platform and/or device can be found by the benchmarks.  On
+Linux, OpenCL works by looking for platform files in the directory
+`/etc/OpenCL/vendors` - you can temporarily remove the ones that you
+do not want to use.  We recommend the use of [clinfo][] for inspecting
+the state of the OpenCL setup.
+
+[clinfo]: https://github.com/Oblomov/clinfo
+
+Rodinia requirements
+~~~~~~~~~~~~~~~~~~~~
+
+The makefile automatically downloads the appropriate version of
+[Rodinia][] and patches the relevant benchmarks with instrumentation code.
+
+[Rodinia]: http://lava.cs.virginia.edu/Rodinia/download_links.htm
+
+Parboil requirements
+~~~~~~~~~~~~~~~~~~~~
+
+[Parboil][] requires a click-through license and so cannot be
+automatically downloaded by the makefile.  Futhermore, Parboil must
+often be manually configured with respect to include paths.  The
+makefile assumes that the environment variable `PARBOIL_LOCATION`
+points to a working Parboil setup (defaults to `$HOME/parboil` if the
+variable is not set).  This infrastructure has been tested with
+Parboil 2.5.
+
+[Parboil]: http://impact.crhc.illinois.edu/parboil/parboil.aspx
+
+Accelerate requirements
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Our Accelerate benchmarks come from [accelerate-examples][].
+Accelerate has its own installation instructions.  If you follow
+these, the necessary binaries will be in `$HOME/.local/bin`, which
+must be added to the `PATH`.
+
+[accelerate-examples]: https://github.com/AccelerateHS/accelerate-examples/
+
+FinPar requirements
+~~~~~~~~~~~~~~~~~~~
+
+Like Rodinia, [FinPar][] is automatically downloaded.
+
+[FinPar]: https://github.com/HIPERFIT/finpar
+
+Usage
+-----
+
+Once everything is installed and working, a simple `make` will run
+every benchmark and put runtimes and Futhark speedups in the
+`runtimes` directory.  The screen will be littered with messages, but
+all the important output will be stored in the `runtimes` directory.
+
+There are several other makefile targets available:
+
+  `make benchmark_rodinia`: Run just the benchmarks from Rodinia and put
+  the results in `runtimes/`.
+
+  `make benchmark_accelerate`: Run just the benchmarks from Accelerate
+  and put the results in `runtimes/`.
+
+  `make benchmark_finpar`: Run the benchmarks from FinPar and put the results in `runtimes/`.
+
+  `make benchmark_parboil`: Run the benchmarks from Parboil and put the results in `runtimes/`.
+
+  `make speedup.pdf`: Generate a graph of all computed speedups.
+  Runtime information from both `runtimes/` and `aux_runtimes/` is
+  used (the latter is optional).  You will have to create the latter
+  directory yourself, preferably by copying it from the `runtimes/`
+  directory of some other machine.  The legend assumes that the
+  `runtimes` directory contains runtimes from a GTX 780 GPU, and
+  `aux_runtimes` from an W8100.  You will have to modify
+  `tools/plot.py` yourself to change these labels.
+
+  `make runtimes.tex`: Generate a table of all runtimes and speedups.
+  As with `make speedup.pdf`, also looks for an `aux_runtimes/`
+  directory.
+
+  `make runtimes/*foo*.speedup`: Run one specific named benchmark and
+  compute its speedup.  *foo* can be one of `srad`, `hotspot`, `nn`,
+  `backprop`, `cfd`, `kmeans`, `lavaMD`, `pathfinder`, `myocyte`,
+  `fluid`, `mandelbrot`, `nbody`, `crystal`, `LocVolCalib_large`,
+  `OptionPricing_large`, `mri-q`, `sgemm`.
+
+  `make benchmark_opencl`: Run all the benchmarks that require only
+  OpenCL.  This is the target you want if you are running on a
+  non-NVIDIA system.

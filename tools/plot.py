@@ -34,17 +34,23 @@ parboil_programs = [("MRI-Q", "mri-q")]
 
 def plotting_info(x):
     name, filename = x
-    with open(os.path.join('runtimes', filename + '.speedup')) as f:
-        speedup = float(f.read())
-        aux_speedup = 0.0
-        try:
-            with open(os.path.join('aux_runtimes', filename + '.speedup')) as f:
-                aux_speedup = float(f.read())
-        except:
+    speedup_file = os.path.join('runtimes', filename + '.speedup')
+    try:
+        with open(speedup_file) as f:
+            speedup = float(f.read())
             aux_speedup = 0.0
-        return (name, speedup, aux_speedup)
+            try:
+                with open(os.path.join('aux_runtimes', filename + '.speedup')) as f:
+                    aux_speedup = float(f.read())
+            except:
+                aux_speedup = 0.0
+            return (name, speedup, aux_speedup)
+    except:
+        print('Skipping %s as %s could not be opened' % (name,speedup_file))
 
-to_plot = list(map(plotting_info, rodinia_programs + finpar_programs + parboil_programs + accelerate_programs))
+to_plot = list(filter(lambda x: x is not None,
+                      map(plotting_info,
+                          rodinia_programs + finpar_programs + parboil_programs + accelerate_programs)))
 
 program_names = [ name for (name, _, _) in to_plot ]
 program_speedups = [ speedup for (_, speedup, _) in to_plot ]

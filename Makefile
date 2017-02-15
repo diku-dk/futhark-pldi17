@@ -3,7 +3,7 @@ RODINIA_MD5=047d983e62107972f217921aa0027b05  rodinia_3.1.tar.bz2
 
 # Parboil insists on some click-through license, so you'll have to get
 # it on your own.
-PARBOIL_LOCATION=$(HOME)/parboil
+PARBOIL_LOCATION?=$(HOME)/parboil
 
 RUNS=10
 
@@ -12,9 +12,15 @@ ACCELERATE_BENCHMARKS=fluid mandelbrot nbody crystal
 FINPAR_BENCHMARKS=LocVolCalib_small LocVolCalib_medium LocVolCalib_large OptionPricing_small OptionPricing_medium OptionPricing_large
 PARBOIL_BENCHMARKS=mri-q
 
+OPENCL_BENCHMARKS=srad hotspot nn backprop cfd kmeans lavaMD pathfinder mri-q LocVolCalib_large OptionPricing_large
+
+.PHONY: clean speedup.pdf runtimes.tex
+
 .SECONDARY:
 
 all: benchmark_rodinia benchmark_accelerate benchmark_finpar benchmark_parboil
+
+benchmark_opencl: $(OPENCL_BENCHMARKS:%=runtimes/%.speedup)
 
 benchmark_rodinia: $(RODINIA_BENCHMARKS:%=runtimes/%.speedup)
 
@@ -24,10 +30,10 @@ benchmark_finpar: $(FINPAR_BENCHMARKS:%=runtimes/%.speedup)
 
 benchmark_parboil: $(PARBOIL_BENCHMARKS:%=runtimes/%.speedup)
 
-speedup.pdf: benchmark_rodinia benchmark_accelerate benchmark_finpar benchmark_parboil
+speedup.pdf:
 	python tools/plot.py $@
 
-runtimes.tex: benchmark_rodinia benchmark_accelerate benchmark_finpar benchmark_parboil
+runtimes.tex:
 	python tools/table.py > $@ || rm -f $@
 
 runtimes/%.speedup: runtimes/%-futhark.avgtime runtimes/%-rodinia.avgtime
@@ -268,6 +274,13 @@ rodinia_3.1-patched: rodinia_3.1.tar.bz2
 
 rodinia_3.1.tar.bz2:
 	wget http://www.cs.virginia.edu/~kw5na/lava/Rodinia/Packages/Current/rodinia_3.1.tar.bz2
+
+sanity_check:
+	gcc sanity/opencl.c -std=c99 -lOpenCL -o sanity/opencl
+	sanity/opencl
+	nvcc sanity/cuda.cu -o sanity/cuda
+	sanity/cuda
+	@echo Sanity-checking succeeded.  You will probably be able to compile and run the benchmarks.
 
 clean:
 	rm -rf rodinia_3.1
