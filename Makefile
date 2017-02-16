@@ -13,12 +13,15 @@ FINPAR_BENCHMARKS=LocVolCalib_large OptionPricing_large
 PARBOIL_BENCHMARKS=mri-q
 
 OPENCL_BENCHMARKS=srad hotspot nn backprop cfd kmeans lavaMD pathfinder mri-q LocVolCalib_large OptionPricing_large
+EASIEST_BENCHMARKS=srad hotspot nn backprop cfd kmeans lavaMD pathfinder LocVolCalib_large OptionPricing_large
 
 .PHONY: clean speedup.pdf runtimes.tex
 
 .SECONDARY:
 
 all: benchmark_rodinia benchmark_accelerate benchmark_finpar benchmark_parboil
+
+benchmark_easiest: $(OPENCL_BENCHMARKS:%=runtimes/%.speedup)
 
 benchmark_opencl: $(OPENCL_BENCHMARKS:%=runtimes/%.speedup)
 

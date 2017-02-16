@@ -166,10 +166,14 @@ all the important output will be stored in the `runtimes` directory.
 
 There are several other makefile targets available:
 
+  `make benchmark_easiest`: Run all benchmarks that require only
+  OpenCL (no CUDA), and which can be installed automatically by the
+  makefile.  **This target is the one most likely to Just Work**, and
+  you can `make speedup.pdf` afterwards to get at least a partial
+  visualisation.
+
   `make benchmark_rodinia`: Run just the benchmarks from Rodinia and
-  put the results in `runtimes/`.  **This target is the one most
-  likely to Just Work**, and you can `make speedup.pdf` afterwards to
-  get at least a partial visualisation.
+  put the results in `runtimes/`.
 
   `make benchmark_accelerate`: Run just the benchmarks from Accelerate
   and put the results in `runtimes/`.
