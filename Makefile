@@ -9,7 +9,7 @@ RUNS=10
 
 RODINIA_BENCHMARKS=srad hotspot nn backprop cfd kmeans lavaMD pathfinder myocyte
 ACCELERATE_BENCHMARKS=fluid mandelbrot nbody crystal
-FINPAR_BENCHMARKS=LocVolCalib_small LocVolCalib_medium LocVolCalib_large OptionPricing_small OptionPricing_medium OptionPricing_large
+FINPAR_BENCHMARKS=LocVolCalib_large OptionPricing_large
 PARBOIL_BENCHMARKS=mri-q
 
 OPENCL_BENCHMARKS=srad hotspot nn backprop cfd kmeans lavaMD pathfinder mri-q LocVolCalib_large OptionPricing_large
@@ -270,12 +270,15 @@ rodinia_3.1-patched: rodinia_3.1.tar.bz2
 rodinia_3.1.tar.bz2:
 	wget http://www.cs.virginia.edu/~kw5na/lava/Rodinia/Packages/Current/rodinia_3.1.tar.bz2
 
-sanity_check:
+sanity_check_opencl:
 	gcc sanity/opencl.c -std=c99 -lOpenCL -o sanity/opencl
 	sanity/opencl
+	@echo Sanity-checking succeeded.  You will probably be able to compile and run the OpenCL benchmarks.
+
+sanity_check_cuda:
 	nvcc sanity/cuda.cu -o sanity/cuda
 	sanity/cuda
-	@echo Sanity-checking succeeded.  You will probably be able to compile and run the benchmarks.
+	@echo Sanity-checking succeeded.  You will probably be able to compile and run the CUDA benchmarks.
 
 sanity_check_parboil:
 	cd $(PARBOIL_LOCATION) && ./parboil run sgemm opencl_base small

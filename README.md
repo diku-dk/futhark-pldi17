@@ -10,23 +10,30 @@ available](https://github.com/HIPERFIT/futhark) and has
 [documentation](https://futhark.readthedocs.io/en/latest/).  This
 repository contains infrastructure, hacks, and tools for orchestrating
 the execution of Futhark implementations of various benchmarks, as
-well as running the originals and computing and visualising relative
-speedups.  The repository does not itself contain the Futhark compiler
-or any benchmarks.  Some of these will be downloaded automatically,
-but others must be installed manually (see below).  The intent is to
-make it clear how we have modified the reference implementations.  In
-practice, we only modify Rodinia, via the file
-`rodinia_3.1-some-instrumentation.patch`.
+well as running the originals implementations and computing and
+visualising relative speedups.  The repository does not itself contain
+the Futhark compiler or any benchmarks.  Some of these will be
+downloaded automatically, but others must be installed manually (as
+described below).  The intent is to make it clear how we modify the
+reference implementations.  In practice, we only modify Rodinia, via
+the file `rodinia_3.1-some-instrumentation.patch`.
 
 This infrastructure depends not only on the Futhark compiler itself,
 but also on four third-party benchmark suites (Rodinia, Parboil,
 FinPar, and Accelerate), the GPU setup on the host system, and some
-Python libraries for automatic plot generation.  In an attempt to
-alleviate the situation, we have put effort into documenting the
-dependencies and creating workarounds for disabling parts of the
-infrastructure.  Please read this document carefully or you are likely
-to have a bad time.  This infrastructure works only on Linux, and some
-Linux knowhow is likely necessary to follow these instructions.
+Python libraries for automatic plot generation.  To manage this, we
+have put effort into documenting the dependencies and creating
+workarounds for disabling parts of the infrastructure.  Even if you
+are unable to install all of the reference benchmarks, you should
+still be able to get partial results.  The Rodinia and FinPar
+benchmark suites are generally the easiest to run, as they are
+downloaded automatically by our scripts.
+
+Please read this document carefully or you are likely to have a bad
+time.  This infrastructure works only on Linux, and some Linux knowhow
+is likely necessary to follow these instructions.  The Linux system
+must have a GPU, and a working OpenCL setup (see specific requirements
+below).
 
 The main interface to the infrastructure is `make`.  The makefile
 contains various targets for running sub-parts of the infrastructure,
@@ -46,8 +53,9 @@ modify the `PATH` (and other environment variables) before running
 
  * A Unix system with basic tools: `patch`, `md5sum`.
 
- * `python3` with a working Matplotlib and Numpy.  **For Parboil to
-   work, it is important that plain `python` is a Python 2.**
+ * `python3` with a working Matplotlib and Numpy (used only for
+ plotting).  **For Parboil to work, it is important that plain
+ `python` is a Python 2.**
 
  * Some Accelerate examples: `accelerate-nbody`,
    `accelerate-crystal`, `accelerate-mandelbrot`, `accelerate-fluid`.
@@ -57,16 +65,23 @@ modify the `PATH` (and other environment variables) before running
 The system must be able to compile OpenCL and CUDA programs with `gcc`
 without requiring any special compiler directives or include paths.
 That is, `gcc opencl_test.c -lOpenCL` and `nvcc cuda_test.cu` must
-work.  You can run `make sanity_check` to quickly check whether your
-system is capable of this.  You may have to modify the environment
-variables `CPATH`, `LIBRARY_PATH`, and `LD_LIBRARY_PATH` to point to
-the appropriate locations locations.  For example, on NVIDIA systems,
-the following is often necessary:
+work.  You can run `make sanity_check_opencl` and `make
+sanity_check_cuda` to quickly check whether your system is capable of
+this.  You may have to modify the environment variables `CPATH`,
+`LIBRARY_PATH`, and `LD_LIBRARY_PATH` to point to the appropriate
+locations locations.  For example, on NVIDIA systems, the following is
+often necessary:
 
     export PATH=/usr/local/cuda/bin:$PATH
     export CPATH=/usr/local/cuda/include:$CPATH
     export LIBRARY_PATH=/usr/local/cuda/lib64:$LIBRARY_PATH
     export LD_LIBRARY_PATH=/usr/local/cuda/lib64/:$LD_LIBRARY_PATH
+
+Reference benchmarks using CUDA will only work if the system has an
+NVIDIA GPU.  For the OpenCL implementations (including all Futhark
+implementations), any AMD or NVIDIA GPU made within the last five
+years and with at least 3GiB of memory should work.  They may also
+work on recent Intel GPUs, although you may run out of memory.
 
 OpenCL/CUDA Device Selection
 ----------------------------
@@ -151,8 +166,10 @@ all the important output will be stored in the `runtimes` directory.
 
 There are several other makefile targets available:
 
-  `make benchmark_rodinia`: Run just the benchmarks from Rodinia and put
-  the results in `runtimes/`.
+  `make benchmark_rodinia`: Run just the benchmarks from Rodinia and
+  put the results in `runtimes/`.  **This target is the one most
+  likely to Just Work**, and you can `make speedup.pdf` afterwards to
+  get at least a partial visualisation.
 
   `make benchmark_accelerate`: Run just the benchmarks from Accelerate
   and put the results in `runtimes/`.
@@ -184,8 +201,11 @@ There are several other makefile targets available:
   OpenCL.  This is the target you want if you are running on a
   non-NVIDIA system.
 
-  `make sanity_check`: Check whether simple OpenCL and CUDA programs
-  can be executed and run.
+  `make sanity_check_cuda`: Check whether simple OpenCL programs can
+  be compiled and run.
+
+  `make sanity_check_opencl`: Check whether simple CUDA programs can
+  be compiled and run.
 
   `make sanity_check_parboil`: Check whether Parboil is available and
   working.
