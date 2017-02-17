@@ -107,7 +107,7 @@ Futhark requirements
 The Futhark compiler has its own [installation instructions][].  If
 you follow these, the necessary binaries will be in
 `$HOME/.local/bin`, which must be added to the `PATH`.  The
-`[futhark-benchmarks][]` repository will be automatically downloaded,
+[futhark-benchmarks][] repository will be automatically downloaded,
 but note that it always downloads the *newest* version of the
 repository.  If you want the version that was available when this
 document was written, you must subsequently enter the
