@@ -289,7 +289,6 @@ sanity_check_parboil:
 
 clean:
 	rm -rf rodinia_3.1
-	rm -f rodinia_3.1.tar.bz2
 	rm -rf futhark-benchmarks
 	rm -rf runtimes
 	rm -rf input
