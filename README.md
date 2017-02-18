@@ -30,10 +30,10 @@ benchmark suites are generally the easiest to run, as they are
 downloaded automatically by our scripts.
 
 Please read this document carefully or you are likely to have a bad
-time.  This infrastructure works only on Linux, and some Linux knowhow
-is likely necessary to follow these instructions.  The Linux system
-must have a GPU, and a working OpenCL setup (see specific requirements
-below).
+time.  This infrastructure has been tested only on Linux, and some
+Unix knowhow is likely necessary to follow these instructions.  The
+system must have a GPU, and a working OpenCL setup (see specific
+requirements below).
 
 The main interface to the infrastructure is `make`.  The makefile
 contains various targets for running sub-parts of the infrastructure,
