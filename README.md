@@ -170,7 +170,8 @@ There are several other makefile targets available:
   OpenCL (no CUDA), and which can be installed automatically by the
   makefile.  **This target is the one most likely to Just Work**, and
   you can `make speedup.pdf` afterwards to get at least a partial
-  visualisation.
+  visualisation.  You will still need to manually install the Futhark
+  compiler, and ensure that `make sanity_check_opencl` works.
 
   `make benchmark_rodinia`: Run just the benchmarks from Rodinia and
   put the results in `runtimes/`.

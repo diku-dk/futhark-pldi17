@@ -66,7 +66,7 @@ runtimes/srad-rodinia.runtimes: rodinia_3.1-patched
 
 runtimes/srad-futhark.runtimes: futhark-benchmarks
 	@mkdir -p runtimes
-	$FUTHARK_OPENCL $</rodinia/srad/srad.fut
+	$(FUTHARK_OPENCL) $</rodinia/srad/srad.fut
 	$</rodinia/srad/srad -r $(RUNS) -t $@ < $</rodinia/srad/data/image.in > /dev/null
 
 runtimes/hotspot-rodinia.runtimes: rodinia_3.1-patched
@@ -76,7 +76,7 @@ runtimes/hotspot-rodinia.runtimes: rodinia_3.1-patched
 
 runtimes/hotspot-futhark.runtimes: futhark-benchmarks
 	@mkdir -p runtimes
-	$FUTHARK_OPENCL $</rodinia/hotspot/hotspot.fut
+	$(FUTHARK_OPENCL) $</rodinia/hotspot/hotspot.fut
 	$</rodinia/hotspot/hotspot -r $(RUNS) -t $@ < $</rodinia/hotspot/data/1024.in > /dev/null
 
 runtimes/nn-rodinia.runtimes: rodinia_3.1-patched
@@ -86,7 +86,7 @@ runtimes/nn-rodinia.runtimes: rodinia_3.1-patched
 
 runtimes/nn-futhark.runtimes: futhark-benchmarks
 	@mkdir -p runtimes
-	$FUTHARK_OPENCL $</rodinia/nn/nn.fut
+	$(FUTHARK_OPENCL) $</rodinia/nn/nn.fut
 	$</rodinia/nn/nn -r $(RUNS) -t $@ < $</rodinia/nn/data/medium.in > /dev/null
 
 runtimes/backprop-rodinia.runtimes: rodinia_3.1-patched
@@ -96,7 +96,7 @@ runtimes/backprop-rodinia.runtimes: rodinia_3.1-patched
 
 runtimes/backprop-futhark.runtimes: futhark-benchmarks
 	@mkdir -p runtimes
-	$FUTHARK_OPENCL $</rodinia/backprop/backprop.fut
+	$(FUTHARK_OPENCL) $</rodinia/backprop/backprop.fut
 	$</rodinia/backprop/backprop -r $(RUNS) -t $@ < $</rodinia/backprop/data/medium.in > /dev/null
 
 runtimes/cfd-rodinia.runtimes: rodinia_3.1-patched
@@ -106,7 +106,7 @@ runtimes/cfd-rodinia.runtimes: rodinia_3.1-patched
 
 runtimes/cfd-futhark.runtimes: futhark-benchmarks
 	@mkdir -p runtimes
-	$FUTHARK_OPENCL $</rodinia/cfd/cfd.fut
+	$(FUTHARK_OPENCL) $</rodinia/cfd/cfd.fut
 	$</rodinia/cfd/cfd -r $(RUNS) -t $@ < $</rodinia/cfd/data/fvcorr.domn.193K.toa > /dev/null
 
 runtimes/kmeans-rodinia.runtimes: rodinia_3.1-patched
@@ -116,7 +116,7 @@ runtimes/kmeans-rodinia.runtimes: rodinia_3.1-patched
 
 runtimes/kmeans-futhark.runtimes: futhark-benchmarks
 	@mkdir -p runtimes
-	$FUTHARK_OPENCL $</rodinia/kmeans/kmeans.fut
+	$(FUTHARK_OPENCL) $</rodinia/kmeans/kmeans.fut
 	$</rodinia/kmeans/kmeans -r $(RUNS) -t $@ < $</rodinia/kmeans/data/kdd_cup.in > /dev/null
 
 runtimes/lavaMD-rodinia.runtimes: rodinia_3.1-patched
@@ -126,7 +126,7 @@ runtimes/lavaMD-rodinia.runtimes: rodinia_3.1-patched
 
 runtimes/lavaMD-futhark.runtimes: futhark-benchmarks
 	@mkdir -p runtimes
-	$FUTHARK_OPENCL $</rodinia/lavaMD/lavaMD.fut
+	$(FUTHARK_OPENCL) $</rodinia/lavaMD/lavaMD.fut
 	$</rodinia/lavaMD/lavaMD -r $(RUNS) -t $@ < $</rodinia/lavaMD/data/10_boxes.in > /dev/null
 
 runtimes/pathfinder-rodinia.runtimes: rodinia_3.1-patched
@@ -136,7 +136,7 @@ runtimes/pathfinder-rodinia.runtimes: rodinia_3.1-patched
 
 runtimes/pathfinder-futhark.runtimes: futhark-benchmarks
 	@mkdir -p runtimes
-	$FUTHARK_OPENCL $</rodinia/pathfinder/pathfinder.fut
+	$(FUTHARK_OPENCL) $</rodinia/pathfinder/pathfinder.fut
 	$</rodinia/pathfinder/pathfinder -r $(RUNS) -t $@ < $</rodinia/pathfinder/data/medium.in > /dev/null
 
 # Myocyte uses the CUDA version, because the OpenCL one does not
@@ -148,7 +148,7 @@ runtimes/myocyte-rodinia.runtimes: rodinia_3.1-patched
 
 runtimes/myocyte-futhark.runtimes: futhark-benchmarks
 	@mkdir -p runtimes
-	$FUTHARK_OPENCL $</rodinia/myocyte/myocyte.fut
+	$(FUTHARK_OPENCL) $</rodinia/myocyte/myocyte.fut
 	$</rodinia/myocyte/myocyte -r $(RUNS) -t $@ < $</rodinia/myocyte/data/medium.in > /dev/null
 
 # Accelerate uses its own internal benchmarking and computes its own
@@ -173,7 +173,7 @@ input/fluid.input:
 
 runtimes/fluid-futhark.runtimes: futhark-benchmarks input/fluid.input
 	@mkdir -p runtimes
-	$FUTHARK_OPENCL futhark-benchmarks/accelerate/fluid/src-futhark/fluid-benchmark.fut
+	$(FUTHARK_OPENCL) futhark-benchmarks/accelerate/fluid/src-futhark/fluid-benchmark.fut
 	futhark-benchmarks/accelerate/fluid/src-futhark/fluid-benchmark -r $(RUNS) -t $@ < input/fluid.input > /dev/null
 
 MANDELBROT_RESOLUTION=4000
@@ -185,7 +185,7 @@ runtimes/mandelbrot-accelerate.csv:
 
 runtimes/mandelbrot-futhark.runtimes: futhark-benchmarks
 	@mkdir -p runtimes
-	$FUTHARK_OPENCL futhark-benchmarks/accelerate/mandelbrot/mandelbrot.fut
+	$(FUTHARK_OPENCL) futhark-benchmarks/accelerate/mandelbrot/mandelbrot.fut
 	echo $(MANDELBROT_RESOLUTION) $(MANDELBROT_RESOLUTION) $(MANDELBROT_LIMIT) -2.23 -1.15 0.83 1.15 | \
 	  futhark-benchmarks/accelerate/mandelbrot/mandelbrot -r $(RUNS) -t $@ > /dev/null
 
@@ -196,7 +196,7 @@ runtimes/nbody-accelerate.csv:
 
 runtimes/nbody-futhark.runtimes: futhark-benchmarks
 	@mkdir -p runtimes
-	$FUTHARK_OPENCL futhark-benchmarks/accelerate/nbody/nbody.fut
+	$(FUTHARK_OPENCL) futhark-benchmarks/accelerate/nbody/nbody.fut
 	cat futhark-benchmarks/accelerate/nbody/nbody-n_steps=1-n_bodies=$(NBODY_N)-timestep=1.0-epsilon=50.0.in | \
 	  futhark-benchmarks/accelerate/nbody/nbody -r $(RUNS) -t $@ > /dev/null
 
@@ -207,7 +207,7 @@ runtimes/crystal-accelerate.csv:
 	accelerate-crystal --cuda --benchmark --size $(CRYSTAL_SIZE) --degree $(CRYSTAL_DEGREE) --csv=$@ || true
 
 runtimes/crystal-futhark.runtimes: futhark-benchmarks
-	$FUTHARK_OPENCL futhark-benchmarks/accelerate/crystal/crystal.fut
+	$(FUTHARK_OPENCL) futhark-benchmarks/accelerate/crystal/crystal.fut
 	echo $(CRYSTAL_SIZE) 30.0 $(CRYSTAL_DEGREE) 1 1.0 | \
 	  futhark-benchmarks/accelerate/crystal/crystal -r $(RUNS) -t $@ > /dev/null
 
@@ -218,7 +218,7 @@ runtimes/LocVolCalib_%-finpar.runtimes: finpar
 	 for i in `seq $(RUNS)`; do make run_$* | grep Runtime | cut -f1; done > ../../../$@)
 
 futhark-benchmarks/finpar/LocVolCalib: futhark-benchmarks
-	$FUTHARK_OPENCL futhark-benchmarks/finpar/LocVolCalib.fut
+	$(FUTHARK_OPENCL) futhark-benchmarks/finpar/LocVolCalib.fut
 
 runtimes/LocVolCalib_%-futhark.runtimes: futhark-benchmarks/finpar/LocVolCalib
 	@mkdir -p runtimes
@@ -232,7 +232,7 @@ runtimes/OptionPricing_%-finpar.runtimes: finpar
 	 for i in `seq $(RUNS)`; do make run_$* | grep Runtime | cut -f1; done > ../../../$@)
 
 futhark-benchmarks/finpar/OptionPricing: futhark-benchmarks
-	$FUTHARK_OPENCL futhark-benchmarks/finpar/OptionPricing.fut
+	$(FUTHARK_OPENCL) futhark-benchmarks/finpar/OptionPricing.fut
 
 runtimes/OptionPricing_%-futhark.runtimes: futhark-benchmarks/finpar/OptionPricing
 	@mkdir -p runtimes
@@ -248,7 +248,7 @@ runtimes/mri-q-parboil.runtimes:
 
 runtimes/mri-q-futhark.runtimes:
 	@mkdir -p runtimes
-	$FUTHARK_OPENCL futhark-benchmarks/parboil/mri-q/mri-q.fut
+	$(FUTHARK_OPENCL) futhark-benchmarks/parboil/mri-q/mri-q.fut
 	cat futhark-benchmarks/parboil/mri-q/data/large.in | futhark-benchmarks/parboil/mri-q/mri-q -r $(RUNS) -t $@ > /dev/null
 
 runtimes/sgemm-parboil.runtimes:
