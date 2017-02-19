@@ -290,6 +290,6 @@ sanity_check_parboil:
 
 clean:
 	rm -rf rodinia_3.1
-	rm -rf futhark-benchmarks
+	cd futhark-benchmarks && git clean -f
 	rm -rf runtimes
 	rm -rf input
