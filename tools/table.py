@@ -64,11 +64,12 @@ to_table = list(filter(lambda x: x is not None,
                        map(table_info_closure(ref_filename_closure('parboil')), parboil_programs) +
                        map(table_info_closure(ref_filename_closure('accelerate')), accelerate_programs)))
 
-print(r'''
-\begin{tabular}{lrrrr}
-& \multicolumn{2}{c}{\textbf{NVIDIA GTX780}} & \multicolumn{2}{c}{\textbf{AMD W8100}} \\
-\textbf{Benchmark} & \textbf{Ref.} & \textbf{Futhark} & \textbf{Ref.} & \textbf{Futhark}\\
-''')
+print(r'''\begin{tabular}{lrrrr}''')
+
+if os.getenv('FUTHARK_LEGENDS'):
+    print(r'''& \multicolumn{2}{c}{\textbf{NVIDIA GTX780}} & \multicolumn{2}{c}{\textbf{AMD W8100}} \\''')
+
+print(r'''\textbf{Benchmark} & \textbf{Ref.} & \textbf{Futhark} & \textbf{Ref.} & \textbf{Futhark}\\''')
 
 for row in to_table:
     print(r'''%s & %s & %s & %s & %s \\''' % row)

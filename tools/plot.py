@@ -120,9 +120,10 @@ def label_rect(rect):
             '%.2f' % height,
             ha='center', va='bottom', fontdict=font, rotation=45)
 
-map(label_rect, rects)
-map(label_rect, aux_rects)
-ax.legend(bbox_to_anchor=(0., 1.15, 1., .115), loc=3, ncol=2, borderaxespad=0.)
+if os.getenv('FUTHARK_LEGENDS'):
+    map(label_rect, rects)
+    map(label_rect, aux_rects)
+    ax.legend(bbox_to_anchor=(0., 1.15, 1., .115), loc=3, ncol=2, borderaxespad=0.)
 
 fig.set_size_inches(8.5, 1.5)
 plt.rc('text')

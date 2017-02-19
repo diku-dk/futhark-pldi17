@@ -187,10 +187,7 @@ There are several other makefile targets available:
   Runtime information from both `runtimes/` and `aux_runtimes/` is
   used (the latter is optional).  You will have to create the latter
   directory yourself, preferably by copying it from the `runtimes/`
-  directory of some other machine.  The legend assumes that the
-  `runtimes` directory contains runtimes from a GTX 780 GPU, and
-  `aux_runtimes` from an W8100.  You will have to modify
-  `tools/plot.py` yourself to change these labels.
+  directory of some other machine.
 
   `make runtimes.tex`: Generate a table of all runtimes and speedups.
   As with `make speedup.pdf`, also looks for an `aux_runtimes/`
