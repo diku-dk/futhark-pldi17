@@ -206,6 +206,8 @@ There are several other makefile targets available:
 
   `make benchmark_parboil`: Run the benchmarks from Parboil and put the results in `runtimes/`.
 
+  `make benchmark`: Run all benchmarks.
+
   `make speedup.pdf`: Generate a graph of all computed speedups.
   Runtime information from both `runtimes/` and `aux_runtimes/` is
   used (the latter is optional).  You will have to create the latter
@@ -234,3 +236,11 @@ There are several other makefile targets available:
 
   `make sanity_check_parboil`: Check whether Parboil is available and
   working.
+
+  `make benchmark_noinplace_kmeans`: Run a variant of the kmeans
+  benchmark that does not use in-place updates and print the resulting
+  runtime to the screen.
+
+  `make benchmark_noinplace_LocVolCalib`: Run a variant of the
+  LocVolCAlib benchmark that does not use in-place updates and print
+  the resulting runtime to the screen.

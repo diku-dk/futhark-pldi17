@@ -20,23 +20,12 @@ fun add_centroids(x: [d]f32) (y: [d]f32): *[d]f32 =
 
 fun centroids_of(k: i32, points: [n][d]f32, membership: [n]i32): *[k][d]f32 =
   let counts_increments = map (\i ->
+                               unsafe
                                let a = replicate k 0
                                let a[i] = 1
                                in a) membership
   let cluster_sizes = map (\x -> reduce (+) 0 x) (transpose counts_increments)
 
-  let points_in_clusters =
-     streamRedPer (\(acc: [k]i32) (x: [k]i32) ->
-                     map (+) acc x)
-                  (\(inp: [chunk]i32) ->
-                     streamSeq (\(acc: *[k]i32) (inp': [chunk']i32) ->
-                                loop (acc) = for i < chunk' do
-                                  let c = inp'[i]
-                                  in unsafe let acc[c] = acc[c] + 1
-                                            in acc
-                                in acc)
-                              (replicate k 0) inp)
-                  membership
   let sums_increments = map (\p c ->
                              unsafe
                              let a = replicate k (replicate d 0.0f32)
