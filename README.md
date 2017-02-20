@@ -1,22 +1,23 @@
 Experimentation Infrastructure for PLDI 2017 Paper
 ==
 
-This repository contains scripts and benchmarks for reproducing the
+This bundle contains scripts and benchmarks for reproducing the
 empirical evaluation of the paper *Futhark: Purely Functional
 GPU-programming with Nested Parallelism and In-place Array Updates*,
 to appear at PLDI 2017.  The primary research artifact of our work is
 the Futhark compiler itself, which is [freely
-available](https://github.com/HIPERFIT/futhark) and has
-[documentation](https://futhark.readthedocs.io/en/latest/).  This
-repository contains infrastructure, hacks, and tools for orchestrating
-the execution of Futhark implementations of various benchmarks, as
-well as running the originals implementations and computing and
-visualising relative speedups.  The repository does not itself contain
-the Futhark compiler or any benchmarks.  Some of these will be
-downloaded automatically, but others must be installed manually (as
-described below).  The intent is to make it clear how we modify the
-reference implementations.  In practice, we only modify Rodinia, via
-the file `rodinia_3.1-some-instrumentation.patch`.
+available](https://github.com/HIPERFIT/futhark) and has [its own
+documentation](https://futhark.readthedocs.io/en/latest/).  This
+bundle contains infrastructure, hacks, and tools for orchestrating the
+execution of Futhark implementations of various benchmarks, as well as
+running the original reference implementations.  Tools are provided
+for computing and visualising relative speedups.  The repository does
+not itself contain the Futhark compiler or any benchmark
+implementations.  Some of these will be downloaded automatically, but
+others must be installed manually (as described below).  The intent is
+to make it clear how we modify the reference implementations.  In
+practice, we only modify Rodinia, via the file
+`rodinia_3.1-some-instrumentation.patch`.
 
 This infrastructure depends not only on the Futhark compiler itself,
 but also on four third-party benchmark suites (Rodinia, Parboil,
@@ -39,10 +40,13 @@ The main interface to the infrastructure is `make`.  The makefile
 contains various targets for running sub-parts of the infrastructure,
 so even if not everything works (or you don't want to bother with
 installing the more complicated parts), you can still get partial
-results.  The valid targets are listed at the end of this guide.
+results.  The valid targets are listed at the end of this guide.  If
+an intermediate step fails due to missing dependencies or
+misconfiguration, you must run `make clean` before proceeding, as it
+is likely that corrupted files will be left behind.
 
-Running all the benchmarks should take less than an hour, depending on
-the speed of your system.
+Running all benchmarks should take less than an hour, depending on the
+speed of your system.
 
 System Requirements
 -------------------
@@ -53,9 +57,9 @@ modify the `PATH` (and other environment variables) before running
 
  * A Unix system with basic tools: `patch`, `md5sum`.
 
- * `python3` with a working Matplotlib and Numpy (used only for
- plotting).  **For Parboil to work, it is important that plain
- `python` is a Python 2.**
+ * `python3` with a working Matplotlib and Numpy, used for plotting
+    and generating input data.  **For Parboil to work, it is important
+    that plain `python` is a Python 2.**
 
  * Some Accelerate examples: `accelerate-nbody`,
    `accelerate-crystal`, `accelerate-mandelbrot`, `accelerate-fluid`.
@@ -77,51 +81,70 @@ often necessary:
     export LIBRARY_PATH=/usr/local/cuda/lib64:$LIBRARY_PATH
     export LD_LIBRARY_PATH=/usr/local/cuda/lib64/:$LD_LIBRARY_PATH
 
-Reference benchmarks using CUDA will only work if the system has an
-NVIDIA GPU.  For the OpenCL implementations (including all Futhark
-implementations), any AMD or NVIDIA GPU made within the last five
-years and with at least 3GiB of memory should work.  They may also
-work on recent Intel GPUs, although you may run out of memory.
+Reference implementations using CUDA will only work if the system has
+an NVIDIA GPU.  For implementations using OpenCL (including all
+Futhark implementations), any AMD or NVIDIA GPU made within the last
+five years and with at least 3GiB of memory should work.  They may
+also work on recent Intel GPUs, although you may run out of memory.
 
 OpenCL/CUDA Device Selection
 ----------------------------
 
-All Futhark programs, and most of the benchmarks, interact with the
-GPU through the OpenCL library, which must be installed and working.
-A few (in particular Accelerate) use NVIDIAs CUDA.  For OpenCL, most
-benchmarks will pick the first OpenCL platform and device found.  Some
-will explicitly only look for devices that register themselves as
-GPUs; whereas others (including Futhark) are less picky, and will
-happily run on an OpenCL CPU device.  It is advisable to ensure that
-only one platform and/or device can be found by the benchmarks.  On
-Linux, OpenCL works by looking for platform files in the directory
-`/etc/OpenCL/vendors` - you can temporarily remove the ones that you
-do not want to use.  We recommend the use of [clinfo][] for inspecting
-the state of the OpenCL setup.
+All Futhark implementations, and most of the reference
+implementations, interact with the GPU through the OpenCL library,
+which must be installed and working.  A few (in particular Accelerate)
+use NVIDIAs CUDA.  For OpenCL, most benchmarks will pick the first
+OpenCL platform and device found.  Some will explicitly only look for
+devices that register themselves as GPUs; whereas others (including
+Futhark) are less picky, and will happily run on an OpenCL CPU device.
+It is advisable to ensure that only one platform and/or device can be
+found by the benchmarks.  On Linux, OpenCL works by looking for
+platform files in the directory `/etc/OpenCL/vendors` - you can
+temporarily remove the ones that you do not want to use.  Getting this
+right is likely to involve hackery and manual labour, as configuring
+GPUs on Linux remains one of the great unsolved problems in computer
+science.  We recommend the use of [clinfo][] for inspecting the state
+of the OpenCL setup.
 
 [clinfo]: https://github.com/Oblomov/clinfo
 
 Futhark requirements
 --------------------
 
-The Futhark compiler has its own [installation instructions][].  If
-you follow these, the necessary binaries will be in
-`$HOME/.local/bin`, which must be added to the `PATH`.  The
-[futhark-benchmarks][] repository will be automatically downloaded,
-but note that it always downloads the *newest* version of the
-repository.  If you want the version that was available when this
-document was written, you must subsequently enter the
-`futhark-benchmarks` directory and check out commit
-`286025cd1fa3c20b892a09fb50273fc0a9a365c2`.
+The Futhark compiler has its own [installation instructions][],
+including both nightly binary releases (for Linux) and instructions on
+compiling from source.  In short, to do the latter, install [The
+Haskell Tool Stack][], go to a checkout of the [futhark repository][],
+and run `stack setup` followed by `stack install`.  The Futhark
+compiler binaries will be in `$HOME/.local/bin`, which must be added
+to the `PATH`.
+
+At the time this document was written, the newest Futhark compiler Git
+revision was `78c956ba58057ca6773cefb466efef2fa65c1386`.
 
 [installation instructions]: https://futhark.readthedocs.io/en/latest/installation.html
+[The Haskell Tool Stack]: https://docs.haskellstack.org/en/stable/README/
+[futhark repository]: https://github.com/HIPERFIT/futhark
+
+Futhark benchmarks
+------------------
+
+The [futhark-benchmarks][] repository will be automatically downloaded
+by the makefile, but note that it always downloads the *newest*
+version of the repository.  This is to ensure that it retrieves a
+version that works with the newest version of the Futhark compiler.
+
+At the time this document was written, the newest Futhark benchmarks
+revision was `c3eee750b3c6aece2d52d2417537d093a9ee8148`.
+
 [futhark-benchmarks]: https://github.com/HIPERFIT/futhark-benchmarks
 
 Rodinia requirements
 --------------------
 
 The makefile automatically downloads the appropriate version of
-[Rodinia][] and patches the relevant benchmarks with instrumentation code.
+[Rodinia][] and patches the relevant benchmarks with instrumentation
+code and other necessary fixes.
 
 [Rodinia]: http://lava.cs.virginia.edu/Rodinia/download_links.htm
 

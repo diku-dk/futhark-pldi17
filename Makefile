@@ -20,7 +20,9 @@ EASIEST_BENCHMARKS=srad hotspot nn backprop cfd kmeans lavaMD pathfinder LocVolC
 
 .SECONDARY:
 
-all: benchmark_rodinia benchmark_accelerate benchmark_finpar benchmark_parboil
+all: benchmark
+
+benchmark: benchmark_rodinia benchmark_accelerate benchmark_finpar benchmark_parboil
 
 benchmark_easiest: $(OPENCL_BENCHMARKS:%=runtimes/%.speedup)
 
@@ -287,6 +289,14 @@ sanity_check_cuda:
 sanity_check_parboil:
 	cd $(PARBOIL_LOCATION) && ./parboil run sgemm opencl_base small
 	@echo Parboil sanity-checking succeeded.  You will probably be able to compile and run the Parboil benchmarks.
+
+benchmark_inplace_kmeans: futhark-benchmarks
+	cp no_inplace/kmeans-no-inplace.fut futhark-benchmarks/rodinia/kmeans
+	futhark-bench --compiler=$(FUTHARK_OPENCL) futhark-benchmarks/rodinia/kmeans/kmeans-no-inplace.fut
+
+benchmark_inplace_LocVolCalib: futhark-benchmarks
+	cp no_inplace/LocVolCalib-no-inplace.fut futhark-benchmarks/finpar/
+	futhark-bench --compiler=$(FUTHARK_OPENCL) futhark-benchmarks/finpar/LocVolCalib-no-inplace.fut
 
 clean:
 	rm -rf rodinia_3.1
