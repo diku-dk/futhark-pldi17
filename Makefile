@@ -290,11 +290,11 @@ sanity_check_parboil:
 	cd $(PARBOIL_LOCATION) && ./parboil run sgemm opencl_base small
 	@echo Parboil sanity-checking succeeded.  You will probably be able to compile and run the Parboil benchmarks.
 
-benchmark_inplace_kmeans: futhark-benchmarks
+benchmark_noinplace_kmeans: futhark-benchmarks
 	cp no_inplace/kmeans-no-inplace.fut futhark-benchmarks/rodinia/kmeans
 	futhark-bench --compiler=$(FUTHARK_OPENCL) futhark-benchmarks/rodinia/kmeans/kmeans-no-inplace.fut
 
-benchmark_inplace_LocVolCalib: futhark-benchmarks
+benchmark_noinplace_LocVolCalib: futhark-benchmarks
 	cp no_inplace/LocVolCalib-no-inplace.fut futhark-benchmarks/finpar/
 	futhark-bench --compiler=$(FUTHARK_OPENCL) futhark-benchmarks/finpar/LocVolCalib-no-inplace.fut
 
