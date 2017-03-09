@@ -727,9 +727,9 @@ Only in rodinia_3.1-patched/opencl/srad/util/opencl: opencl.o
 Only in rodinia_3.1-patched/opencl/srad/util/timer: timer.o
 diff -ur rodinia_3.1/README rodinia_3.1-patched/README
 --- rodinia_3.1/README	2015-12-13 04:42:33.000000000 +0100
-+++ rodinia_3.1-patched/README	2017-02-16 07:11:43.539124948 +0100
++++ rodinia_3.1-patched/README	2017-03-09 12:25:50.857923879 +0100
 @@ -1,3 +1,6 @@
-+NOTICE: this tree has been modified by the futhark-ppopp17 Makefile
++NOTICE: this tree has been modified by the futhark-pldi17 Makefile
 +to add consistent timing to some benchmark implementations.
 +
  Rodinia Benchmark Suite 3.1
