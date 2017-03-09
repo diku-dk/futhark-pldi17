@@ -36,11 +36,17 @@ def ref_filename_closure(ref):
 def fut_filename(d, filename):
     return os.path.join(d, filename + '-futhark.avgtime')
 
+def get_ref_avgtime(d, ref_filename, filename):
+    with open(ref_filename(d, filename)) as f:
+        return '%.1f' % float(f.read())
+
+def get_fut_avgtime(d, ref_filename, filename):
+    with open(fut_filename(d, filename)) as f:
+        return '%.1f' % float(f.read())
+
 def get_avgtimes(d, ref_filename, filename):
-    with open(ref_filename(d, filename)) as ref_f:
-        with open(fut_filename(d, filename)) as fut_f:
-            return ('%.1f' % float(ref_f.read()),
-                    '%.1f' % float(fut_f.read()))
+    return (get_ref_avgtime(d, ref_filename, filename),
+            get_fut_avgtime(d, ref_filename, filename))
 
 
 def table_info_closure(ref_filename):
@@ -49,8 +55,12 @@ def table_info_closure(ref_filename):
         try:
             (ref_avgtime, fut_avgtime) = get_avgtimes('runtimes', ref_filename, filename)
             try:
-                (aux_ref_avgtime, aux_fut_avgtime) = get_avgtimes('aux_runtimes', ref_filename, filename)
-                return (name, ref_avgtime, fut_avgtime, aux_ref_avgtime, aux_fut_avgtime)
+                aux_fut_avgtime = get_fut_avgtime('aux_runtimes', ref_filename, filename)
+                try:
+                    aux_ref_avgtime = get_ref_avgtime('aux_runtimes', ref_filename, filename)
+                    return (name, ref_avgtime, fut_avgtime, aux_ref_avgtime, aux_fut_avgtime)
+                except:
+                    return (name, ref_avgtime, fut_avgtime, '---', aux_fut_avgtime)
             except:
                 return (name, ref_avgtime, fut_avgtime, '---', '---')
         except:
