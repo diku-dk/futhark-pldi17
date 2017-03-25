@@ -11,7 +11,7 @@ fun closest_point (p1: (i32,f32)) (p2: (i32,f32)): (i32,f32) =
   if #1 p1 < #1 p2 then p1 else p2
 
 fun find_nearest_point(pts: [k][d]f32) (pt: [d]f32): i32 =
-  let (i, _) = reduceComm closest_point (0, euclid_dist_2 pt pts[0])
+  let (i, _) = reduce_comm closest_point (0, euclid_dist_2 pt pts[0])
                (zip (iota k) (map (euclid_dist_2 pt) pts))
   in i
 
