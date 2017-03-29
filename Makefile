@@ -24,6 +24,8 @@ all: benchmark
 
 benchmark: benchmark_rodinia benchmark_accelerate benchmark_finpar benchmark_parboil
 
+benchmark_futhark: $(RODINIA_BENCHMARKS:%=runtimes/%-futhark.avgtime) $(ACCELERATE_BENCHMARKS:%=runtimes/%-futhark.avgtime) $(FINPAR_BENCHMARKS:%=runtimes/%-futhark.avgtime) $(PARBOIL_BENCHMARKS:%=runtimes/%-futhark.avgtime)
+
 benchmark_easiest: $(OPENCL_BENCHMARKS:%=runtimes/%.speedup)
 
 benchmark_opencl: $(OPENCL_BENCHMARKS:%=runtimes/%.speedup)

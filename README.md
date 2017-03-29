@@ -208,6 +208,11 @@ There are several other makefile targets available:
 
   `make benchmark`: Run all benchmarks.
 
+  `make benchmark_futhark`: Run all Futhark implementation and produce
+  `.runtimes` and `.avgtime` files in the `runtimes/` directory.  Does
+  not run reference implementations, and thus does not produce
+  `.speedup` files.
+
   `make speedup.pdf`: Generate a graph of all computed speedups.
   Runtime information from both `runtimes/` and `aux_runtimes/` is
   used (the latter is optional).  You will have to create the latter
