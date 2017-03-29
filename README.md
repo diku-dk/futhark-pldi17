@@ -244,3 +244,9 @@ There are several other makefile targets available:
   `make benchmark_noinplace_LocVolCalib`: Run a variant of the
   LocVolCAlib benchmark that does not use in-place updates and print
   the resulting runtime to the screen.
+
+Paper Data
+----------
+
+Runtime data used to compute the figures in the paper can be found in
+the `paper_data` directory.
