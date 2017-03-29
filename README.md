@@ -208,6 +208,11 @@ There are several other makefile targets available:
 
   `make benchmark`: Run all benchmarks.
 
+  `make benchmark_futhark`: Run all Futhark implementation and produce
+  `.runtimes` and `.avgtime` files in the `runtimes/` directory.  Does
+  not run reference implementations, and thus does not produce
+  `.speedup` files.
+
   `make speedup.pdf`: Generate a graph of all computed speedups.
   Runtime information from both `runtimes/` and `aux_runtimes/` is
   used (the latter is optional).  You will have to create the latter
@@ -244,3 +249,9 @@ There are several other makefile targets available:
   `make benchmark_noinplace_LocVolCalib`: Run a variant of the
   LocVolCAlib benchmark that does not use in-place updates and print
   the resulting runtime to the screen.
+
+Paper Data
+----------
+
+Runtime data used to compute the figures in the paper can be found in
+the `paper_data` directory.
