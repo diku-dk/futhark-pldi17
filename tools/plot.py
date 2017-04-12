@@ -72,6 +72,8 @@ ind = width+np.concatenate(([0], np.cumsum(spaces)[:-1]))
 
 fig, ax = plt.subplots()
 
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['ps.fonttype'] = 42
 font = {'family': 'normal',
         'size' : 9}
 plt.rc('font', **font)
@@ -112,8 +114,7 @@ def label_rect(rect):
         return
 
     font = {'family': 'sans-serif',
-            'weight': 'bold',
-            'size': 8,
+            'size': 9,
     }
     bounded_height = min(6.0, height)
     ax.text(rect.get_x() + rect.get_width(), 1.05*bounded_height,
